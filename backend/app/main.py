@@ -18,6 +18,8 @@ from app.exceptions import (
 from app.monitoring.prometheus import router as prometheus_router
 from app.monitoring.healthcheck import healthcheck
 
+from app.api.router import api_router
+
 # =========================================================
 # INITIALIZE APP
 # =========================================================
@@ -72,3 +74,8 @@ async def health():
 
 
 app.include_router(prometheus_router)
+
+app.include_router(
+    api_router,
+    prefix=settings.API_V1_PREFIX,
+)

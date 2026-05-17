@@ -12,6 +12,15 @@ class BM25Retriever:
     ) -> None:
         self.documents = documents
 
+        # =============================================
+        # HANDLE EMPTY CORPUS
+        # =============================================
+
+        if not documents:
+            self.bm25 = None
+            self.tokenized_documents = []
+            return
+
         self.tokenized_documents = [doc.split() for doc in documents]
 
         self.bm25 = BM25Okapi(self.tokenized_documents)
@@ -24,6 +33,13 @@ class BM25Retriever:
         """
         Perform BM25 retrieval.
         """
+
+        # =============================================
+        # HANDLE EMPTY INDEX
+        # =============================================
+
+        if self.bm25 is None:
+            return []
 
         tokenized_query = query.split()
 
