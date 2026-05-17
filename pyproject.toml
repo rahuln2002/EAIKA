@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eai-ka"
+version = "0.1.0"
+description = "Enterprise AI Knowledge Assistant"
+authors = [
+    { name = "Rahul Nihalani" }
+]
+readme = "README.md"
+requires-python = ">=3.12.13"
+
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
+    "pydantic-settings",
+    "sqlalchemy",
+    "psycopg2-binary",
+    "alembic",
+    "redis",
+    "celery",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "python-multipart",
+    "qdrant-client",
+    "faiss-cpu",
+    "sentence-transformers",
+    "transformers",
+    "torch",
+    "langchain",
+    "llama-index",
+    "pypdf",
+    "python-docx",
+    "tiktoken",
+    "numpy",
+    "pandas",
+    "httpx",
+    "structlog",
+    "prometheus-client",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "black",
+    "ruff",
+    "mypy",
+    "pre-commit",
+]
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+include = ["app*"]
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.12.13"
+strict = true

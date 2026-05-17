@@ -1,0 +1,127 @@
+# =========================
+# CORE WEB FRAMEWORK
+# =========================
+fastapi
+uvicorn[standard]
+starlette
+
+# =========================
+# CONFIGURATION
+# =========================
+pydantic
+pydantic-settings
+python-dotenv
+
+# =========================
+# DATABASE
+# =========================
+sqlalchemy
+psycopg2-binary
+alembic
+
+# =========================
+# AUTHENTICATION & SECURITY
+# =========================
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt
+
+# =========================
+# FILE HANDLING
+# =========================
+python-multipart
+pypdf
+python-docx
+
+# =========================
+# VECTOR DATABASES
+# =========================
+qdrant-client
+faiss-cpu
+
+# =========================
+# AI / LLM / NLP
+# =========================
+torch
+transformers
+sentence-transformers
+accelerate
+tokenizers
+tiktoken
+
+# =========================
+# LANGCHAIN / LLAMAINDEX
+# =========================
+langchain
+langchain-community
+langchain-core
+llama-index
+
+# =========================
+# OPENAI / LLM PROVIDERS
+# =========================
+openai
+mistralai
+
+# =========================
+# REDIS / CACHE / TASK QUEUE
+# =========================
+redis
+celery
+
+# =========================
+# HTTP / API CLIENTS
+# =========================
+httpx
+requests
+
+# =========================
+# DATA PROCESSING
+# =========================
+numpy
+pandas
+scikit-learn
+
+# =========================
+# LOGGING & MONITORING
+# =========================
+structlog
+loguru
+prometheus-client
+
+# =========================
+# WEBSOCKETS
+# =========================
+websockets
+
+# =========================
+# VALIDATION & UTILITIES
+# =========================
+tenacity
+orjson
+
+# =========================
+# TESTING
+# =========================
+pytest
+pytest-asyncio
+pytest-cov
+
+# =========================
+# CODE QUALITY
+# =========================
+black
+ruff
+mypy
+pre-commit
+
+# =========================
+# OPTIONAL OCR SUPPORT
+# =========================
+pytesseract
+Pillow
+
+# =========================
+# PRODUCTION SERVER
+# =========================
+gunicorn
