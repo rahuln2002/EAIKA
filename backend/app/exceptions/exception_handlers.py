@@ -7,6 +7,9 @@ from app.exceptions.error_codes import (
     INTERNAL_SERVER_ERROR,
     VALIDATION_ERROR,
 )
+from app.monitoring.logging import (
+    log_error,
+)
 
 
 def register_exception_handlers(
@@ -66,6 +69,14 @@ def register_exception_handlers(
         request: Request,
         exc: Exception,
     ) -> JSONResponse:
+
+        log_error(
+            "Unhandled exception occurred",
+            path=request.url.path,
+            method=request.method,
+            error=str(exc),
+        )
+
         return JSONResponse(
             status_code=500,
             content={

@@ -2,7 +2,13 @@ import time
 
 from fastapi import FastAPI, Request
 
-REQUEST_COUNT = 0
+from app.monitoring.metrics import (
+    ERROR_COUNT,
+    REQUEST_COUNT,
+    REQUEST_LATENCY,
+)
+
+REQUEST_COUNT_LOCAL = 0
 
 
 def setup_metrics_middleware(
@@ -17,21 +23,24 @@ def setup_metrics_middleware(
         request: Request,
         call_next,
     ):
-        global REQUEST_COUNT
-
-        REQUEST_COUNT += 1
+        REQUEST_COUNT.inc()
 
         start_time = time.time()
 
-        response = await call_next(request)
+        try:
+            response = await call_next(request)
+
+        except Exception:
+            ERROR_COUNT.inc()
+            raise
 
         process_time = round(
             time.time() - start_time,
             4,
         )
 
-        response.headers["X-Process-Time"] = str(process_time)
+        REQUEST_LATENCY.observe(process_time)
 
-        response.headers["X-Request-Count"] = str(REQUEST_COUNT)
+        response.headers["X-Process-Time"] = str(process_time)
 
         return response

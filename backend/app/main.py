@@ -15,6 +15,9 @@ from app.exceptions import (
     register_exception_handlers,
 )
 
+from app.monitoring.prometheus import router as prometheus_router
+from app.monitoring.healthcheck import healthcheck
+
 # =========================================================
 # INITIALIZE APP
 # =========================================================
@@ -61,3 +64,11 @@ async def root():
     return {
         "message": "Enterprise AI Knowledge Assistant API",
     }
+
+
+@app.get("/health")
+async def health():
+    return await healthcheck()
+
+
+app.include_router(prometheus_router)
