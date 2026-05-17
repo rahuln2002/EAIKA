@@ -1,5 +1,21 @@
-from app.db.init_db import init_db
+from app.core.security.jwt_handler import (
+    create_access_token,
+    decode_access_token,
+)
 
-init_db()
+data = {
+    "sub": "rahul",
+    "email": "rahul@example.com",
+}
 
-print("Tables created successfully!")
+token = create_access_token(data)
+
+print("TOKEN:")
+print(token)
+
+print()
+
+decoded = decode_access_token(token)
+
+print("DECODED:")
+print(decoded)
