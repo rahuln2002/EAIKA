@@ -1,5 +1,9 @@
 from fastapi import APIRouter
+from fastapi import Depends
 
+from app.api.dependencies.auth import (
+    get_current_user,
+)
 from app.rag.pipelines.rag_pipeline import (
     RAGPipeline,
 )
@@ -11,22 +15,23 @@ router = APIRouter(
 
 documents = []
 
+rag_pipeline = RAGPipeline(documents)
+
 
 @router.post("/")
 async def chat(
     query: str,
+    current_user=Depends(get_current_user),
 ):
     """
-    RAG chat endpoint.
+    Protected RAG chat endpoint.
     """
-
-    if not documents:
-        return {"message": "No documents indexed yet."}
-
-    rag_pipeline = RAGPipeline(documents)
 
     response = rag_pipeline.run(
         query=query,
     )
 
-    return response
+    return {
+        "user": current_user,
+        "response": response,
+    }

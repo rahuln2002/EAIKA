@@ -5,9 +5,13 @@ from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 
 
-def get_db() -> Generator[Session, None, None]:
+def get_db() -> Generator[
+    Session,
+    None,
+    None,
+]:
     """
-    Dependency for database session.
+    Database session dependency.
     """
 
     db = SessionLocal()

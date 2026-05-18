@@ -1,21 +1,27 @@
-from datetime import datetime, timedelta, timezone
-from typing import Any
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
 
-from jose import JWTError, jwt
+from jose import JWTError
+from jose import jwt
 
-from app.core.config.settings import settings
+from app.core.config.settings import (
+    settings,
+)
 
 # =========================================================
-# JWT CONFIGURATION
+# JWT CONFIG
 # =========================================================
 
 SECRET_KEY = settings.JWT_SECRET_KEY
+
 ALGORITHM = settings.JWT_ALGORITHM
-ACCESS_TOKEN_EXPIRE_SECONDS = settings.JWT_EXPIRATION
+
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 def create_access_token(
-    data: dict[str, Any],
+    data: dict,
 ) -> str:
     """
     Create JWT access token.
@@ -23,7 +29,7 @@ def create_access_token(
 
     to_encode = data.copy()
 
-    expire = datetime.now(timezone.utc) + timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update(
         {
@@ -40,11 +46,11 @@ def create_access_token(
     return encoded_jwt
 
 
-def decode_access_token(
+def verify_token(
     token: str,
-) -> dict[str, Any] | None:
+):
     """
-    Decode and validate JWT token.
+    Verify JWT token.
     """
 
     try:

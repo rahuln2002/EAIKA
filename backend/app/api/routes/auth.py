@@ -1,16 +1,18 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+from sqlalchemy.orm import Session
 
-from app.core.security.jwt_handler import (
-    create_access_token,
-)
-from app.core.security.password_handler import (
-    hash_password,
-    verify_password,
+from app.api.dependencies.database import (
+    get_db,
 )
 from app.db.schemas.auth_schema import (
     TokenResponse,
     UserCreate,
     UserLogin,
+)
+from app.services.auth.auth_service import (
+    AuthService,
 )
 
 router = APIRouter(
@@ -18,40 +20,32 @@ router = APIRouter(
     tags=["Authentication"],
 )
 
-# =========================================================
-# TEMP USER STORE
-# =========================================================
 
-fake_users_db = {}
-
-
-@router.post(
-    "/signup",
-)
+@router.post("/signup")
 async def signup(
     user: UserCreate,
+    db: Session = Depends(get_db),
 ):
     """
     Register new user.
     """
 
-    if user.email in fake_users_db:
-        raise HTTPException(
-            status_code=400,
-            detail="User already exists.",
+    try:
+        created_user = AuthService.register_user(
+            db,
+            user,
         )
 
-    hashed_password = hash_password(user.password)
+        return {
+            "message": "User created successfully.",
+            "email": created_user.email,
+        }
 
-    fake_users_db[user.email] = {
-        "username": user.username,
-        "email": user.email,
-        "hashed_password": hashed_password,
-    }
-
-    return {
-        "message": "User created successfully.",
-    }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+        )
 
 
 @router.post(
@@ -60,32 +54,22 @@ async def signup(
 )
 async def login(
     user: UserLogin,
+    db: Session = Depends(get_db),
 ):
     """
     Authenticate user.
     """
 
-    db_user = fake_users_db.get(user.email)
-
-    if not db_user:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials.",
+    try:
+        access_token = AuthService.authenticate_user(
+            db,
+            user,
         )
 
-    if not verify_password(
-        user.password,
-        db_user["hashed_password"],
-    ):
+        return TokenResponse(access_token=access_token)
+
+    except ValueError as e:
         raise HTTPException(
             status_code=401,
-            detail="Invalid credentials.",
+            detail=str(e),
         )
-
-    access_token = create_access_token(
-        {
-            "sub": user.email,
-        }
-    )
-
-    return TokenResponse(access_token=access_token)
