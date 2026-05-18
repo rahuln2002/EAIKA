@@ -17,11 +17,6 @@ router = APIRouter(
     tags=["Chat"],
 )
 
-documents = [
-    "Retrieval-Augmented Generation improves factual AI systems.",
-    "Embeddings enable semantic search.",
-]
-
 
 @router.post("/")
 async def chat(
@@ -50,7 +45,6 @@ async def chat(
         db=db,
         chat_id=chat_session.id,
         query=query,
-        documents=documents,
     )
 
     return {

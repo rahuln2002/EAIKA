@@ -61,18 +61,13 @@ class QdrantStore:
 
         points = []
 
-        for idx, (
-            embedding,
-            payload,
-        ) in enumerate(
-            zip(
-                embeddings,
-                metadata,
-            )
+        for embedding, payload in zip(
+            embeddings,
+            metadata,
         ):
             points.append(
                 PointStruct(
-                    id=idx,
+                    id=payload["chunk_id"],
                     vector=embedding,
                     payload=payload,
                 )

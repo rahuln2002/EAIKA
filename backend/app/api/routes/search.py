@@ -1,8 +1,12 @@
 from fastapi import APIRouter
 from fastapi import Depends
+from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import (
     get_current_user,
+)
+from app.api.dependencies.database import (
+    get_db,
 )
 from app.services.retrieval.retrieval_service import (
     RetrievalService,
@@ -13,23 +17,24 @@ router = APIRouter(
     tags=["Search"],
 )
 
-documents = [
-    "RAG improves retrieval systems.",
-    "Embeddings power semantic search.",
-]
-
-retrieval_service = RetrievalService(documents)
+retrieval_service = RetrievalService()
 
 
 @router.post("/")
 async def search(
     query: str,
+    db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
     """
-    Protected semantic search endpoint.
+    Production semantic search endpoint.
     """
 
-    results = retrieval_service.retrieve_context(query)
+    results = retrieval_service.retrieve_context(
+        db=db,
+        query=query,
+    )
 
-    return results
+    return {
+        "results": results,
+    }

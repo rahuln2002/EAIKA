@@ -63,7 +63,6 @@ class ChatService:
         db: Session,
         chat_id: int,
         query: str,
-        documents: list[str],
     ) -> dict:
         """
         Generate and persist RAG response.
@@ -84,9 +83,12 @@ class ChatService:
         # RUN RAG
         # =================================================
 
-        rag_pipeline = RAGPipeline(documents)
+        rag_pipeline = RAGPipeline()
 
-        response = rag_pipeline.run(query=query)
+        response = rag_pipeline.run(
+            db=db,
+            query=query,
+        )
 
         answer = response["answer"]
 

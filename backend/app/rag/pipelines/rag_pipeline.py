@@ -1,3 +1,5 @@
+from sqlalchemy.orm import Session
+
 from app.rag.prompts.retrieval_prompt import (
     build_rag_prompt,
 )
@@ -11,49 +13,36 @@ from app.services.retrieval.retrieval_service import (
 
 class RAGPipeline:
     """
-    End-to-end Retrieval-Augmented Generation pipeline.
+    Production RAG pipeline.
     """
 
     def __init__(
         self,
-        documents: list[str],
         provider: str = "openai",
     ) -> None:
         self.provider = provider
 
-        self.retrieval_service = RetrievalService(documents)
+        self.retrieval_service = RetrievalService()
 
     def run(
         self,
+        db: Session,
         query: str,
         top_k: int = 5,
     ) -> dict:
         """
-        Execute full RAG pipeline.
+        Execute production RAG pipeline.
         """
 
-        retrieval_results = self.retrieval_service.retrieve_context(
+        # =================================================
+        # RETRIEVE REAL CONTEXT
+        # =================================================
+
+        context_chunks = self.retrieval_service.retrieve_context(
+            db=db,
             query=query,
             top_k=top_k,
         )
-
-        # =================================================
-        # EXTRACT CONTEXT
-        # =================================================
-
-        dense_results = retrieval_results["dense_results"]
-
-        context_chunks = []
-
-        for result in dense_results:
-            payload = getattr(
-                result,
-                "payload",
-                {},
-            )
-
-            if "text" in payload:
-                context_chunks.append(payload["text"])
 
         # =================================================
         # BUILD PROMPT

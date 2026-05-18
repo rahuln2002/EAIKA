@@ -7,11 +7,17 @@ from app.db.models.document import (
 from app.rag.chunking.recursive_chunker import (
     RecursiveChunker,
 )
+from app.rag.vectorstore.vectorstore_manager import (
+    VectorStoreManager,
+)
+from app.services.embeddings.embedding_manager import (
+    EmbeddingManager,
+)
 
 
 class UploadService:
     """
-    Persistent upload service.
+    Persistent upload + vector sync service.
     """
 
     @staticmethod
@@ -46,12 +52,18 @@ class UploadService:
         text: str,
     ) -> int:
         """
-        Persist document chunks.
+        Persist chunks + sync embeddings.
         """
 
         chunker = RecursiveChunker()
 
         chunks = chunker.chunk_text(text)
+
+        # =================================================
+        # STORE CHUNKS IN POSTGRES
+        # =================================================
+
+        stored_chunks = []
 
         for idx, chunk_text in enumerate(chunks):
             chunk = Chunk(
@@ -62,6 +74,47 @@ class UploadService:
 
             db.add(chunk)
 
+            stored_chunks.append(chunk)
+
         db.commit()
+
+        # =================================================
+        # REFRESH TO GET IDS
+        # =================================================
+
+        for chunk in stored_chunks:
+            db.refresh(chunk)
+
+        # =================================================
+        # GENERATE EMBEDDINGS
+        # =================================================
+
+        embeddings = EmbeddingManager.embed_texts(chunks)
+
+        # =================================================
+        # VECTOR METADATA
+        # =================================================
+
+        metadata = []
+
+        for chunk in stored_chunks:
+            metadata.append(
+                {
+                    "chunk_id": chunk.id,
+                    "document_id": chunk.document_id,
+                    "text": chunk.content,
+                }
+            )
+
+        # =================================================
+        # STORE IN VECTOR DB
+        # =================================================
+
+        vectorstore = VectorStoreManager(provider="qdrant")
+
+        vectorstore.add_embeddings(
+            embeddings=embeddings,
+            metadata=metadata,
+        )
 
         return len(chunks)
