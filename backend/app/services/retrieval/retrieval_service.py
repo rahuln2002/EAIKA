@@ -4,9 +4,11 @@ from app.db.models.chunk import Chunk
 from app.rag.retrievers.dense_retriever import (
     DenseRetriever,
 )
-
 from app.services.reranking.reranker_service import (
     RerankerService,
+)
+from app.rag.retrievers.hybrid_retriever import (
+    HybridRetriever,
 )
 
 
@@ -32,40 +34,43 @@ class RetrievalService:
         Retrieve relevant chunks.
         """
 
-        retrieval_results = self.retriever.retrieve(
+        # =============================================
+        # GET DOCUMENT CORPUS
+        # =============================================
+
+        documents = self.get_all_chunk_texts(db)
+
+        # =============================================
+        # HYBRID RETRIEVER
+        # =============================================
+
+        hybrid_retriever = HybridRetriever(documents=documents)
+
+        retrieved_chunks = hybrid_retriever.retrieve(
             query=query,
             top_k=retrieval_k,
         )
 
-        chunk_texts = []
+        # =============================================
+        # RERANK RESULTS
+        # =============================================
 
-        for result in retrieval_results:
-            payload = getattr(
-                result,
-                "payload",
-                {},
-            )
+        reranked_chunks = RerankerService.rerank(
+            query=query,
+            documents=retrieved_chunks,
+            top_k=top_k,
+        )
 
-            chunk_id = payload.get("chunk_id")
+        return reranked_chunks
 
-            if not chunk_id:
-                continue
+    def get_all_chunk_texts(
+        self,
+        db: Session,
+    ) -> list[str]:
+        """
+        Retrieve all chunk texts.
+        """
 
-            chunk = db.query(Chunk).filter(Chunk.id == chunk_id).first()
+        chunks = db.query(Chunk).all()
 
-            if chunk:
-                chunk_texts.append(chunk.content)
-
-            # =============================================
-            # RERANK RESULTS
-            # =============================================
-
-            reranked_chunks = RerankerService.rerank(
-                query=query,
-                documents=chunk_texts,
-                top_k=top_k,
-            )
-
-            return reranked_chunks
-
-        return chunk_texts
+        return [chunk.content for chunk in chunks]

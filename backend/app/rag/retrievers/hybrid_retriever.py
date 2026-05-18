@@ -16,30 +16,67 @@ class HybridRetriever:
         documents: list[str],
         provider: str = "qdrant",
     ) -> None:
-        self.dense_retriever = DenseRetriever(provider=provider)
+        self.documents = documents
 
-        self.bm25_retriever = BM25Retriever(documents)
+        self.bm25 = BM25Retriever(documents)
+
+        self.dense = DenseRetriever(provider=provider)
 
     def retrieve(
         self,
         query: str,
-        top_k: int = 5,
-    ) -> dict:
+        top_k: int = 10,
+    ) -> list[str]:
         """
-        Combine dense + BM25 retrieval.
+        Hybrid retrieval.
         """
 
-        dense_results = self.dense_retriever.retrieve(
-            query,
+        # =============================================
+        # BM25 RESULTS
+        # =============================================
+
+        bm25_results = self.bm25.retrieve(
+            query=query,
             top_k=top_k,
         )
 
-        sparse_results = self.bm25_retriever.retrieve(
-            query,
+        # =============================================
+        # DENSE RESULTS
+        # =============================================
+
+        dense_results = self.dense.retrieve(
+            query=query,
             top_k=top_k,
         )
 
-        return {
-            "dense_results": dense_results,
-            "sparse_results": sparse_results,
-        }
+        # =============================================
+        # EXTRACT PAYLOAD TEXTS
+        # =============================================
+
+        dense_texts = []
+
+        for result in dense_results:
+            payload = getattr(
+                result,
+                "payload",
+                {},
+            )
+
+            text = payload.get("text")
+
+            if text:
+                dense_texts.append(text)
+
+        # =============================================
+        # FUSION
+        # =============================================
+
+        combined = bm25_results + dense_texts
+
+        # =============================================
+        # DEDUPLICATION
+        # =============================================
+
+        unique_results = list(dict.fromkeys(combined))
+
+        return unique_results[:top_k]

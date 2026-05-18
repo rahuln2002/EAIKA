@@ -3,7 +3,7 @@ from rank_bm25 import BM25Okapi
 
 class BM25Retriever:
     """
-    BM25 keyword retriever.
+    BM25 lexical retriever.
     """
 
     def __init__(
@@ -12,46 +12,27 @@ class BM25Retriever:
     ) -> None:
         self.documents = documents
 
-        # =============================================
-        # HANDLE EMPTY CORPUS
-        # =============================================
+        self.tokenized_docs = [doc.lower().split() for doc in documents]
 
-        if not documents:
-            self.bm25 = None
-            self.tokenized_documents = []
-            return
-
-        self.tokenized_documents = [doc.split() for doc in documents]
-
-        self.bm25 = BM25Okapi(self.tokenized_documents)
+        self.bm25 = BM25Okapi(self.tokenized_docs)
 
     def retrieve(
         self,
         query: str,
-        top_k: int = 5,
-    ):
+        top_k: int = 10,
+    ) -> list[str]:
         """
-        Perform BM25 retrieval.
+        Retrieve BM25-ranked documents.
         """
 
-        # =============================================
-        # HANDLE EMPTY INDEX
-        # =============================================
-
-        if self.bm25 is None:
-            return []
-
-        tokenized_query = query.split()
+        tokenized_query = query.lower().split()
 
         scores = self.bm25.get_scores(tokenized_query)
 
         ranked_results = sorted(
-            zip(
-                self.documents,
-                scores,
-            ),
+            zip(self.documents, scores),
             key=lambda x: x[1],
             reverse=True,
         )
 
-        return ranked_results[:top_k]
+        return [doc for doc, _ in ranked_results[:top_k]]

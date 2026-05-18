@@ -82,6 +82,6 @@ class RAGPipeline:
             "answer": answer,
             "retrieved_context": context_chunks,
             "conversation_history": (conversation_history),
-            "retrieval_strategy": "dense+rereank",
+            "retrieval_strategy": ("hybrid+dense+rerank"),
             "evaluation": evaluation,
         }
