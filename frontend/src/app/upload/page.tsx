@@ -2,49 +2,74 @@
 
 import { useState } from "react";
 
-import { uploadDocument } from "@/services/uploadService";
+import toast from "react-hot-toast";
+
+import { useUploadDocument } from "@/hooks/useUploadDocument";
 
 export default function UploadPage() {
   const [file, setFile] =
     useState<File | null>(null);
 
+  const uploadMutation =
+    useUploadDocument();
+
   const handleUpload =
     async () => {
-      if (!file) return;
+      if (!file) {
+        toast.error(
+          "Please select a file."
+        );
+
+        return;
+      }
 
       try {
-        await uploadDocument(file);
+        await uploadMutation.mutateAsync(
+          file
+        );
 
-        alert(
+        toast.success(
           "Upload successful!"
         );
 
+        setFile(null);
+
       } catch {
-        alert("Upload failed.");
+        toast.error(
+          "Upload failed."
+        );
       }
     };
 
   return (
-    <div className="p-10">
-      <h1 className="text-2xl mb-4">
+    <div className="max-w-xl mx-auto p-10">
+      <h1 className="text-3xl font-bold mb-6">
         Upload Document
       </h1>
 
-      <input
-        type="file"
-        onChange={(e) =>
-          setFile(
-            e.target.files?.[0] || null
-          )
-        }
-      />
+      <div className="border rounded-lg p-6">
+        <input
+          type="file"
+          onChange={(e) =>
+            setFile(
+              e.target.files?.[0] || null
+            )
+          }
+          className="mb-4"
+        />
 
-      <button
-        className="bg-black text-white p-2 ml-2"
-        onClick={handleUpload}
-      >
-        Upload
-      </button>
+        <button
+          className="bg-black text-white px-6 py-3 rounded"
+          onClick={handleUpload}
+          disabled={
+            uploadMutation.isPending
+          }
+        >
+          {uploadMutation.isPending
+            ? "Uploading..."
+            : "Upload"}
+        </button>
+      </div>
     </div>
   );
 }

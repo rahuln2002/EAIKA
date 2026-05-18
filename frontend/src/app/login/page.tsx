@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 
+import toast from "react-hot-toast";
+
 import { saveToken } from "@/lib/auth";
-import { loginUser } from "@/services/authService";
+import { useLogin } from "@/hooks/useLogin";
 
 export default function LoginPage() {
   const [email, setEmail] =
@@ -12,33 +14,42 @@ export default function LoginPage() {
   const [password, setPassword] =
     useState("");
 
+  const loginMutation =
+    useLogin();
+
   const handleLogin = async () => {
     try {
       const response =
-        await loginUser(
-          email,
-          password
+        await loginMutation.mutateAsync(
+          {
+            email,
+            password,
+          }
         );
 
       saveToken(
         response.access_token
       );
 
-      alert("Login successful!");
+      toast.success(
+        "Login successful!"
+      );
 
     } catch {
-      alert("Login failed.");
+      toast.error(
+        "Login failed."
+      );
     }
   };
 
   return (
-    <div className="p-10">
-      <h1 className="text-2xl mb-4">
+    <div className="max-w-md mx-auto p-10">
+      <h1 className="text-3xl font-bold mb-6">
         Login
       </h1>
 
       <input
-        className="border p-2 block mb-4"
+        className="border p-3 w-full mb-4 rounded"
         placeholder="Email"
         value={email}
         onChange={(e) =>
@@ -47,7 +58,7 @@ export default function LoginPage() {
       />
 
       <input
-        className="border p-2 block mb-4"
+        className="border p-3 w-full mb-4 rounded"
         type="password"
         placeholder="Password"
         value={password}
@@ -57,10 +68,15 @@ export default function LoginPage() {
       />
 
       <button
-        className="bg-black text-white p-2"
+        className="bg-black text-white p-3 rounded w-full"
         onClick={handleLogin}
+        disabled={
+          loginMutation.isPending
+        }
       >
-        Login
+        {loginMutation.isPending
+          ? "Logging in..."
+          : "Login"}
       </button>
     </div>
   );
