@@ -1,58 +1,44 @@
-from datetime import datetime
-
-from sqlalchemy import DateTime, ForeignKey, String, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import Text
+from sqlalchemy.orm import relationship
 
 from app.db.base import Base
 
 
 class Message(Base):
+    """
+    Chat message model.
+    """
+
     __tablename__ = "messages"
 
-    # =========================================================
-    # PRIMARY KEY
-    # =========================================================
-
-    id: Mapped[int] = mapped_column(
+    id = Column(
+        Integer,
         primary_key=True,
         index=True,
     )
 
-    # =========================================================
-    # FOREIGN KEY
-    # =========================================================
-
-    chat_id: Mapped[int] = mapped_column(
-        ForeignKey("chats.id"),
+    role = Column(
+        String,
         nullable=False,
     )
 
-    # =========================================================
-    # MESSAGE DATA
-    # =========================================================
-
-    role: Mapped[str] = mapped_column(
-        String(50),
-        nullable=False,
-    )
-
-    content: Mapped[str] = mapped_column(
+    content = Column(
         Text,
         nullable=False,
     )
 
-    # =========================================================
-    # TIMESTAMP
-    # =========================================================
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
+    chat_id = Column(
+        Integer,
+        ForeignKey("chats.id"),
     )
 
-    # =========================================================
+    # =====================================================
     # RELATIONSHIPS
-    # =========================================================
+    # =====================================================
 
     chat = relationship(
         "Chat",

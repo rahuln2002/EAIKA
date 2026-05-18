@@ -1,51 +1,43 @@
-from sqlalchemy import ForeignKey, String, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import Text
+from sqlalchemy.orm import relationship
 
 from app.db.base import Base
 
 
 class Chunk(Base):
+    """
+    Document chunk model.
+    """
+
     __tablename__ = "chunks"
 
-    # =========================================================
-    # PRIMARY KEY
-    # =========================================================
-
-    id: Mapped[int] = mapped_column(
+    id = Column(
+        Integer,
         primary_key=True,
         index=True,
     )
 
-    # =========================================================
-    # FOREIGN KEY
-    # =========================================================
-
-    document_id: Mapped[int] = mapped_column(
-        ForeignKey("documents.id"),
-        nullable=False,
-    )
-
-    # =========================================================
-    # CHUNK DATA
-    # =========================================================
-
-    chunk_text: Mapped[str] = mapped_column(
+    content = Column(
         Text,
         nullable=False,
     )
 
-    embedding_id: Mapped[str] = mapped_column(
-        String(255),
+    chunk_index = Column(
+        Integer,
         nullable=False,
     )
 
-    chunk_index: Mapped[int] = mapped_column(
-        nullable=False,
+    document_id = Column(
+        Integer,
+        ForeignKey("documents.id"),
     )
 
-    # =========================================================
+    # =====================================================
     # RELATIONSHIPS
-    # =========================================================
+    # =====================================================
 
     document = relationship(
         "Document",

@@ -1,76 +1,64 @@
-from datetime import datetime
-
-from sqlalchemy import Boolean, DateTime, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from app.db.base import Base
 
 
 class User(Base):
+    """
+    User database model.
+    """
+
     __tablename__ = "users"
 
-    # =========================================================
-    # PRIMARY KEY
-    # =========================================================
-
-    id: Mapped[int] = mapped_column(
+    id = Column(
+        Integer,
         primary_key=True,
         index=True,
     )
 
-    # =========================================================
-    # USER INFO
-    # =========================================================
-
-    username: Mapped[str] = mapped_column(
-        String(50),
-        unique=True,
+    username = Column(
+        String,
         nullable=False,
     )
 
-    email: Mapped[str] = mapped_column(
-        String(255),
+    email = Column(
+        String,
         unique=True,
-        nullable=False,
         index=True,
-    )
-
-    hashed_password: Mapped[str] = mapped_column(
-        String(255),
         nullable=False,
     )
 
-    is_admin: Mapped[bool] = mapped_column(
-        Boolean,
-        default=False,
+    hashed_password = Column(
+        String,
+        nullable=False,
     )
 
-    is_active: Mapped[bool] = mapped_column(
+    is_active = Column(
         Boolean,
         default=True,
     )
 
-    # =========================================================
-    # TIMESTAMPS
-    # =========================================================
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
     )
 
-    # =========================================================
+    # =====================================================
     # RELATIONSHIPS
-    # =========================================================
+    # =====================================================
 
     documents = relationship(
         "Document",
         back_populates="owner",
-        cascade="all, delete-orphan",
     )
 
     chats = relationship(
         "Chat",
         back_populates="user",
-        cascade="all, delete-orphan",
     )

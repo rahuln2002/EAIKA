@@ -1,51 +1,42 @@
-from datetime import datetime
-
-from sqlalchemy import DateTime, ForeignKey, Integer
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import Float
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy.sql import func
 
 from app.db.base import Base
 
 
 class Analytics(Base):
+    """
+    Analytics tracking model.
+    """
+
     __tablename__ = "analytics"
 
-    # =========================================================
-    # PRIMARY KEY
-    # =========================================================
-
-    id: Mapped[int] = mapped_column(
+    id = Column(
+        Integer,
         primary_key=True,
         index=True,
     )
 
-    # =========================================================
-    # FOREIGN KEY
-    # =========================================================
-
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"),
+    event_type = Column(
+        String,
         nullable=False,
     )
 
-    # =========================================================
-    # METRICS
-    # =========================================================
-
-    total_queries: Mapped[int] = mapped_column(
-        Integer,
-        default=0,
+    latency = Column(
+        Float,
+        nullable=True,
     )
 
-    documents_uploaded: Mapped[int] = mapped_column(
-        Integer,
-        default=0,
+    provider = Column(
+        String,
+        nullable=True,
     )
 
-    # =========================================================
-    # TIMESTAMP
-    # =========================================================
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
     )

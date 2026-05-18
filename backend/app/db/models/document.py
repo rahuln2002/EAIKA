@@ -1,73 +1,50 @@
-from datetime import datetime
-
-from sqlalchemy import DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from app.db.base import Base
 
 
 class Document(Base):
+    """
+    Uploaded document model.
+    """
+
     __tablename__ = "documents"
 
-    # =========================================================
-    # PRIMARY KEY
-    # =========================================================
-
-    id: Mapped[int] = mapped_column(
+    id = Column(
+        Integer,
         primary_key=True,
         index=True,
     )
 
-    # =========================================================
-    # FOREIGN KEYS
-    # =========================================================
-
-    owner_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"),
+    filename = Column(
+        String,
         nullable=False,
     )
 
-    # =========================================================
-    # FILE INFO
-    # =========================================================
-
-    filename: Mapped[str] = mapped_column(
-        String(255),
+    file_path = Column(
+        String,
         nullable=False,
     )
 
-    file_type: Mapped[str] = mapped_column(
-        String(50),
-        nullable=False,
-    )
-
-    file_size: Mapped[int] = mapped_column(
+    owner_id = Column(
         Integer,
-        nullable=False,
+        ForeignKey("users.id"),
     )
 
-    storage_path: Mapped[str] = mapped_column(
-        String(500),
-        nullable=False,
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
     )
 
-    status: Mapped[str] = mapped_column(
-        String(50),
-        default="uploaded",
-    )
-
-    # =========================================================
-    # TIMESTAMPS
-    # =========================================================
-
-    uploaded_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
-    )
-
-    # =========================================================
+    # =====================================================
     # RELATIONSHIPS
-    # =========================================================
+    # =====================================================
 
     owner = relationship(
         "User",
@@ -77,5 +54,4 @@ class Document(Base):
     chunks = relationship(
         "Chunk",
         back_populates="document",
-        cascade="all, delete-orphan",
     )

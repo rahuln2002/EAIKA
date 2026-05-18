@@ -8,9 +8,13 @@ from app.db.models.user import User  # noqa: F401
 from app.db.session import engine
 
 
-def init_db() -> None:
+def init_db():
     """
     Initialize database tables.
     """
 
     Base.metadata.create_all(bind=engine)
+
+
+if __name__ == "__main__":
+    init_db()
