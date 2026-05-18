@@ -1,8 +1,8 @@
-from app.services.llm.provider_manager import (
-    ProviderManager,
-)
 from app.workers.celery_workers import (
     celery_app,
+)
+from app.services.summarization.summarization_service import (
+    SummarizationService,
 )
 
 
@@ -11,18 +11,7 @@ def summarize_document_task(
     text: str,
 ):
     """
-    Summarize document asynchronously.
+    Background document summarization.
     """
 
-    prompt = f"""
-Summarize the following document:
-
-{text}
-"""
-
-    summary = ProviderManager.generate_response(
-        provider="openai",
-        prompt=prompt,
-    )
-
-    return summary
+    return SummarizationService.map_reduce_summarize(text=text)

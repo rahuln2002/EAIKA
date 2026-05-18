@@ -29,6 +29,10 @@ export default function Navbar() {
       <Link href="/register">
         Register
       </Link>
+
+      <Link href="/summarize">
+        Summarize
+      </Link>
     </nav>
   );
 }
