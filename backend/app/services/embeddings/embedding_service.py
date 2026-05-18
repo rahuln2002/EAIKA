@@ -7,10 +7,23 @@ from app.core.config.settings import (
 )
 
 # =========================================================
-# LOAD EMBEDDING MODEL
+# GLOBAL MODEL HOLDER
 # =========================================================
 
-embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL)
+embedding_model = None
+
+
+def get_embedding_model():
+    """
+    Lazy-load embedding model.
+    """
+
+    global embedding_model
+
+    if embedding_model is None:
+        embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL)
+
+    return embedding_model
 
 
 class EmbeddingService:
@@ -26,7 +39,9 @@ class EmbeddingService:
         Generate embedding for text.
         """
 
-        embedding = embedding_model.encode(
+        model = get_embedding_model()
+
+        embedding = model.encode(
             text,
             normalize_embeddings=True,
         )
@@ -41,7 +56,9 @@ class EmbeddingService:
         Generate embeddings for multiple texts.
         """
 
-        embeddings = embedding_model.encode(
+        model = get_embedding_model()
+
+        embeddings = model.encode(
             texts,
             normalize_embeddings=True,
         )

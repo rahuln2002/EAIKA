@@ -2,15 +2,6 @@ from fastapi import APIRouter
 from fastapi import File
 from fastapi import UploadFile
 
-from app.rag.ingestion.cleaner import (
-    clean_text,
-)
-from app.rag.ingestion.docx_loader import (
-    load_docx,
-)
-from app.rag.ingestion.pdf_loader import (
-    load_pdf,
-)
 from app.rag.pipelines.indexing_pipeline import (
     IndexingPipeline,
 )
@@ -20,6 +11,9 @@ from app.utils.file_utils import (
 from app.utils.validators import (
     validate_file_extension,
     validate_file_size,
+)
+from app.workers.tasks.ingestion_tasks import (
+    ingest_document_task,
 )
 
 router = APIRouter(
@@ -53,33 +47,12 @@ async def upload_document(
     file_path = await save_uploaded_file(file)
 
     # =====================================================
-    # LOAD TEXT
-    # =====================================================
-
-    if file.filename.endswith(".pdf"):
-        document_text = load_pdf(file_path)
-
-    elif file.filename.endswith(".docx"):
-        document_text = load_docx(file_path)
-
-    else:
-        return {
-            "error": "Unsupported file type.",
-        }
-
-    # =====================================================
-    # CLEAN TEXT
-    # =====================================================
-
-    cleaned_text = clean_text(document_text)
-
-    # =====================================================
     # INDEX DOCUMENT
     # =====================================================
 
-    result = indexing_pipeline.index_document(cleaned_text)
+    task = ingest_document_task.delay(file_path)
 
     return {
-        "message": "Document indexed successfully.",
-        "result": result,
+        "message": "Document queued for indexing.",
+        "task_id": task.id,
     }
