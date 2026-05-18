@@ -1,5 +1,9 @@
 from fastapi import APIRouter
+from fastapi import Depends
 
+from app.api.dependencies.auth import (
+    get_current_user,
+)
 from app.services.retrieval.retrieval_service import (
     RetrievalService,
 )
@@ -9,21 +13,22 @@ router = APIRouter(
     tags=["Search"],
 )
 
-documents = []
+documents = [
+    "RAG improves retrieval systems.",
+    "Embeddings power semantic search.",
+]
+
+retrieval_service = RetrievalService(documents)
 
 
 @router.post("/")
 async def search(
     query: str,
+    current_user=Depends(get_current_user),
 ):
     """
-    Semantic search endpoint.
+    Protected semantic search endpoint.
     """
-
-    if not documents:
-        return {"message": "No documents indexed yet."}
-
-    retrieval_service = RetrievalService(documents)
 
     results = retrieval_service.retrieve_context(query)
 
