@@ -5,6 +5,10 @@ from app.rag.retrievers.dense_retriever import (
     DenseRetriever,
 )
 
+from app.services.reranking.reranker_service import (
+    RerankerService,
+)
+
 
 class RetrievalService:
     """
@@ -22,6 +26,7 @@ class RetrievalService:
         db: Session,
         query: str,
         top_k: int = 5,
+        retrieval_k: int = 20,
     ) -> list[str]:
         """
         Retrieve relevant chunks.
@@ -29,7 +34,7 @@ class RetrievalService:
 
         retrieval_results = self.retriever.retrieve(
             query=query,
-            top_k=top_k,
+            top_k=retrieval_k,
         )
 
         chunk_texts = []
@@ -50,5 +55,17 @@ class RetrievalService:
 
             if chunk:
                 chunk_texts.append(chunk.content)
+
+            # =============================================
+            # RERANK RESULTS
+            # =============================================
+
+            reranked_chunks = RerankerService.rerank(
+                query=query,
+                documents=chunk_texts,
+                top_k=top_k,
+            )
+
+            return reranked_chunks
 
         return chunk_texts

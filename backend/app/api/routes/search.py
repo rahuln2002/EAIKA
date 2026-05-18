@@ -36,5 +36,7 @@ async def search(
     )
 
     return {
+        "query": query,
         "results": results,
+        "retrieval_strategy": ("dense+rereank"),
     }
