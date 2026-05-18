@@ -13,7 +13,12 @@ async def analytics():
     """
 
     return {
-        "total_documents": 0,
-        "total_queries": 0,
         "system_status": "healthy",
+        "evaluation_enabled": True,
+        "metrics": [
+            "faithfulness",
+            "hallucination",
+            "relevancy",
+            "retrieval_metrics",
+        ],
     }

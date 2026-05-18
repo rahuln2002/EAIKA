@@ -9,6 +9,9 @@ from app.services.llm.provider_manager import (
 from app.services.retrieval.retrieval_service import (
     RetrievalService,
 )
+from app.services.analytics.analytics_service import (
+    AnalyticsService,
+)
 
 
 class RAGPipeline:
@@ -64,10 +67,21 @@ class RAGPipeline:
             prompt=prompt,
         )
 
+        # =============================================
+        # RUN EVALUATION
+        # =============================================
+
+        evaluation = AnalyticsService.evaluate_response(
+            query=query,
+            answer=answer,
+            retrieved_context=context_chunks,
+        )
+
         return {
             "query": query,
             "answer": answer,
             "retrieved_context": context_chunks,
             "conversation_history": (conversation_history),
             "retrieval_strategy": "dense+rereank",
+            "evaluation": evaluation,
         }
