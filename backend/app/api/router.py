@@ -18,6 +18,9 @@ from app.api.routes.search import (
 from app.api.routes.upload import (
     router as upload_router,
 )
+from app.api.routes.websocket import (
+    router as websocket_router,
+)
 
 api_router = APIRouter()
 
@@ -32,3 +35,5 @@ api_router.include_router(search_router)
 api_router.include_router(chat_router)
 
 api_router.include_router(analytics_router)
+
+api_router.include_router(websocket_router)
