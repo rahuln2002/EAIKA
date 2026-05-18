@@ -21,9 +21,8 @@ venv/
 .env.dev
 
 # Data
-data/raw/
-data/temp/
-data/processed/
+data/
+backend/data/
 
 # OS
 .DS_Store
