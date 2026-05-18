@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 
 from app.db.models.chat import Chat
 from app.db.models.message import Message
@@ -65,7 +66,7 @@ class ChatService:
         query: str,
     ) -> dict:
         """
-        Generate and persist RAG response.
+        Generate conversational RAG response.
         """
 
         # =================================================
@@ -80,6 +81,15 @@ class ChatService:
         )
 
         # =================================================
+        # GET CONVERSATION HISTORY
+        # =================================================
+
+        history = ChatService.get_chat_history(
+            db=db,
+            chat_id=chat_id,
+        )
+
+        # =================================================
         # RUN RAG
         # =================================================
 
@@ -88,6 +98,7 @@ class ChatService:
         response = rag_pipeline.run(
             db=db,
             query=query,
+            conversation_history=history,
         )
 
         answer = response["answer"]
@@ -104,3 +115,30 @@ class ChatService:
         )
 
         return response
+
+    @staticmethod
+    def get_chat_history(
+        db: Session,
+        chat_id: int,
+        limit: int = 10,
+    ) -> list[str]:
+        """
+        Retrieve recent conversation history.
+        """
+
+        messages = (
+            db.query(Message)
+            .filter(Message.chat_id == chat_id)
+            .order_by(desc(Message.id))
+            .limit(limit)
+            .all()
+        )
+
+        messages.reverse()
+
+        history = []
+
+        for message in messages:
+            history.append(f"{message.role}: {message.content}")
+
+        return history

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
@@ -21,21 +23,25 @@ router = APIRouter(
 @router.post("/")
 async def chat(
     query: str,
+    chat_id: Optional[int] = None,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
     """
-    Persistent RAG chat endpoint.
+    Conversational RAG endpoint.
     """
 
     # =====================================================
-    # CREATE CHAT SESSION
+    # CREATE NEW CHAT IF NEEDED
     # =====================================================
 
-    chat_session = ChatService.create_chat(
-        db=db,
-        user_id=current_user["sub"],
-    )
+    if chat_id is None:
+        chat_session = ChatService.create_chat(
+            db=db,
+            user_id=int(current_user["sub"]),
+        )
+
+        chat_id = chat_session.id
 
     # =====================================================
     # GENERATE RESPONSE
@@ -43,11 +49,33 @@ async def chat(
 
     response = ChatService.generate_rag_response(
         db=db,
-        chat_id=chat_session.id,
+        chat_id=chat_id,
         query=query,
     )
 
     return {
-        "chat_id": chat_session.id,
+        "chat_id": chat_id,
         "response": response,
+    }
+
+
+@router.get("/{chat_id}")
+async def get_chat_history(
+    chat_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    """
+    Retrieve chat history.
+    """
+
+    history = ChatService.get_chat_history(
+        db=db,
+        chat_id=chat_id,
+        limit=50,
+    )
+
+    return {
+        "chat_id": chat_id,
+        "messages": history,
     }

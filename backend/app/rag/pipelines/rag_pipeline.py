@@ -13,7 +13,7 @@ from app.services.retrieval.retrieval_service import (
 
 class RAGPipeline:
     """
-    Production RAG pipeline.
+    Conversational RAG pipeline.
     """
 
     def __init__(
@@ -28,14 +28,15 @@ class RAGPipeline:
         self,
         db: Session,
         query: str,
+        conversation_history: list[str],
         top_k: int = 5,
     ) -> dict:
         """
-        Execute production RAG pipeline.
+        Execute conversational RAG pipeline.
         """
 
         # =================================================
-        # RETRIEVE REAL CONTEXT
+        # RETRIEVE CONTEXT
         # =================================================
 
         context_chunks = self.retrieval_service.retrieve_context(
@@ -45,12 +46,13 @@ class RAGPipeline:
         )
 
         # =================================================
-        # BUILD PROMPT
+        # BUILD CONVERSATIONAL PROMPT
         # =================================================
 
         prompt = build_rag_prompt(
             query=query,
             context_chunks=context_chunks,
+            conversation_history=conversation_history,
         )
 
         # =================================================
@@ -66,4 +68,5 @@ class RAGPipeline:
             "query": query,
             "answer": answer,
             "retrieved_context": context_chunks,
+            "conversation_history": (conversation_history),
         }

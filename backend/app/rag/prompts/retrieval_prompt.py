@@ -6,27 +6,33 @@ from app.rag.prompts.system_prompt import (
 def build_rag_prompt(
     query: str,
     context_chunks: list[str],
+    conversation_history: list[str],
 ) -> str:
     """
-    Construct RAG prompt with retrieved context.
+    Build conversational RAG prompt.
     """
 
     context = "\n\n".join(context_chunks)
 
+    history = "\n".join(conversation_history)
+
     prompt = f"""
 {SYSTEM_PROMPT}
+
+Conversation History:
+{history}
 
 Retrieved Context:
 {context}
 
-User Question:
+Current User Question:
 {query}
 
 Instructions:
-- Answer ONLY using retrieved context
-- If answer is not found, say:
-  "I could not find relevant information."
-- Be accurate and concise
+- Use conversation history for continuity
+- Use retrieved context for factual grounding
+- If information is unavailable, say so
+- Be concise and accurate
 
 Answer:
 """
