@@ -1,46 +1,33 @@
 import time
 
-from fastapi import FastAPI, Request
+from starlette.middleware.base import (
+    BaseHTTPMiddleware,
+)
 
 from app.monitoring.metrics import (
-    ERROR_COUNT,
     REQUEST_COUNT,
     REQUEST_LATENCY,
 )
 
-REQUEST_COUNT_LOCAL = 0
 
-
-def setup_metrics_middleware(
-    app: FastAPI,
-) -> None:
+class MetricsMiddleware(BaseHTTPMiddleware):
     """
-    Configure metrics middleware.
+    Prometheus metrics middleware.
     """
 
-    @app.middleware("http")
-    async def metrics_middleware(
-        request: Request,
+    async def dispatch(
+        self,
+        request,
         call_next,
     ):
         REQUEST_COUNT.inc()
 
         start_time = time.time()
 
-        try:
-            response = await call_next(request)
+        response = await call_next(request)
 
-        except Exception:
-            ERROR_COUNT.inc()
-            raise
+        duration = time.time() - start_time
 
-        process_time = round(
-            time.time() - start_time,
-            4,
-        )
-
-        REQUEST_LATENCY.observe(process_time)
-
-        response.headers["X-Process-Time"] = str(process_time)
+        REQUEST_LATENCY.observe(duration)
 
         return response

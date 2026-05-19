@@ -1,29 +1,24 @@
-from prometheus_client import Counter
-from prometheus_client import Histogram
-
-# =========================================================
-# REQUEST METRICS
-# =========================================================
+from prometheus_client import (
+    Counter,
+    Histogram,
+)
 
 REQUEST_COUNT = Counter(
-    "http_requests_total",
-    "Total HTTP requests",
+    "request_count",
+    "Total API Requests",
 )
-
-# =========================================================
-# LATENCY METRICS
-# =========================================================
 
 REQUEST_LATENCY = Histogram(
-    "http_request_duration_seconds",
-    "HTTP request latency",
+    "request_latency_seconds",
+    "API Request Latency",
 )
 
-# =========================================================
-# ERROR METRICS
-# =========================================================
+LLM_REQUEST_COUNT = Counter(
+    "llm_request_count",
+    "Total LLM Requests",
+)
 
-ERROR_COUNT = Counter(
-    "http_errors_total",
-    "Total HTTP errors",
+RETRIEVAL_REQUEST_COUNT = Counter(
+    "retrieval_request_count",
+    "Total Retrieval Requests",
 )

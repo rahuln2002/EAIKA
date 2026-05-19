@@ -1,36 +1,41 @@
-from app.monitoring.logging import (
-    log_error,
-    log_info,
-)
+import time
+from functools import wraps
+
 from app.telemetry.tracing import (
-    generate_trace_id,
+    tracer,
 )
 
 
-def observe_event(
-    message: str,
-    level: str = "info",
-    **kwargs,
-) -> None:
+def trace_function(
+    span_name: str,
+):
     """
-    Observe application event.
+    Trace function execution.
     """
 
-    trace_id = generate_trace_id()
+    def decorator(func):
+        @wraps(func)
+        def wrapper(
+            *args,
+            **kwargs,
+        ):
+            with tracer.start_as_current_span(span_name) as span:
+                start_time = time.time()
 
-    event_data = {
-        "trace_id": trace_id,
-        **kwargs,
-    }
+                result = func(
+                    *args,
+                    **kwargs,
+                )
 
-    if level == "error":
-        log_error(
-            message,
-            **event_data,
-        )
+                duration = time.time() - start_time
 
-    else:
-        log_info(
-            message,
-            **event_data,
-        )
+                span.set_attribute(
+                    "execution_time",
+                    duration,
+                )
+
+                return result
+
+        return wrapper
+
+    return decorator

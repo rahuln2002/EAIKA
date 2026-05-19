@@ -12,6 +12,9 @@ from app.services.retrieval.retrieval_service import (
 from app.services.analytics.analytics_service import (
     AnalyticsService,
 )
+from app.telemetry.observability import (
+    trace_function,
+)
 
 
 class RAGPipeline:
@@ -27,6 +30,7 @@ class RAGPipeline:
 
         self.retrieval_service = RetrievalService()
 
+    @trace_function("rag_pipeline_execution")
     def run(
         self,
         db: Session,

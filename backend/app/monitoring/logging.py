@@ -1,31 +1,28 @@
-from app.core.config.logging_config import (
-    logger,
+import logging
+
+# =========================================================
+# LOGGING CONFIGURATION
+# =========================================================
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=("%(asctime)s - %(name)s - %(levelname)s - %(message)s"),
 )
 
+logger = logging.getLogger("enterprise-ai-ka")
 
-def log_info(
-    message: str,
-    **kwargs,
-) -> None:
-    """
-    Log info message.
-    """
-
-    logger.info(
-        message,
-        **kwargs,
-    )
+# =========================================================
+# HELPER FUNCTIONS
+# =========================================================
 
 
-def log_error(
-    message: str,
-    **kwargs,
-) -> None:
-    """
-    Log error message.
-    """
+def log_info(message: str):
+    logger.info(message)
 
-    logger.error(
-        message,
-        **kwargs,
-    )
+
+def log_warning(message: str):
+    logger.warning(message)
+
+
+def log_error(message: str):
+    logger.error(message)

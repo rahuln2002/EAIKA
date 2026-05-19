@@ -3,8 +3,6 @@ from fastapi import FastAPI
 from app.api.middleware import (
     setup_auth_middleware,
     setup_cors,
-    setup_metrics_middleware,
-    setup_request_logging_middleware,
 )
 from app.core.config import (
     logger,
@@ -19,6 +17,14 @@ from app.monitoring.prometheus import router as prometheus_router
 from app.monitoring.healthcheck import healthcheck
 
 from app.api.router import api_router
+
+from app.api.middleware.logging import (
+    LoggingMiddleware,
+)
+
+from app.api.middleware.metrics import (
+    MetricsMiddleware,
+)
 
 # =========================================================
 # INITIALIZE APP
@@ -43,9 +49,9 @@ logger.info("Starting application...")
 
 setup_cors(app)
 
-setup_request_logging_middleware(app)
+app.add_middleware(LoggingMiddleware)
 
-setup_metrics_middleware(app)
+app.add_middleware(MetricsMiddleware)
 
 setup_auth_middleware(app)
 

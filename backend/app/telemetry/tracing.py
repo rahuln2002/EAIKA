@@ -1,9 +1,27 @@
-import uuid
+from opentelemetry import trace
 
+from opentelemetry.sdk.resources import (
+    SERVICE_NAME,
+    Resource,
+)
 
-def generate_trace_id() -> str:
-    """
-    Generate unique trace ID.
-    """
+from opentelemetry.sdk.trace import (
+    TracerProvider,
+)
 
-    return str(uuid.uuid4())
+from opentelemetry.sdk.trace.export import (
+    BatchSpanProcessor,
+    ConsoleSpanExporter,
+)
+
+resource = Resource.create({SERVICE_NAME: "enterprise-ai-ka"})
+
+provider = TracerProvider(resource=resource)
+
+processor = BatchSpanProcessor(ConsoleSpanExporter())
+
+provider.add_span_processor(processor)
+
+trace.set_tracer_provider(provider)
+
+tracer = trace.get_tracer(__name__)
