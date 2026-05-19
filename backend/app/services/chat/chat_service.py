@@ -64,6 +64,7 @@ class ChatService:
         db: Session,
         chat_id: int,
         query: str,
+        user_id: int,
     ) -> dict:
         """
         Generate conversational RAG response.
@@ -99,6 +100,7 @@ class ChatService:
             db=db,
             query=query,
             conversation_history=history,
+            user_id=user_id,
         )
 
         answer = response["answer"]

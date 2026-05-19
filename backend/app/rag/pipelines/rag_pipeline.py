@@ -31,6 +31,7 @@ class RAGPipeline:
         self,
         db: Session,
         query: str,
+        user_id: int,
         conversation_history: list[str],
         top_k: int = 5,
     ) -> dict:
@@ -45,6 +46,7 @@ class RAGPipeline:
         context_chunks = self.retrieval_service.retrieve_context(
             db=db,
             query=query,
+            user_id=user_id,
             top_k=top_k,
         )
 

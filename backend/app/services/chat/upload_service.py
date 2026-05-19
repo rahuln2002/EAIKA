@@ -50,6 +50,7 @@ class UploadService:
         db: Session,
         document_id: int,
         text: str,
+        owner_id: int,
     ) -> int:
         """
         Persist chunks + sync embeddings.
@@ -102,6 +103,7 @@ class UploadService:
                 {
                     "chunk_id": chunk.id,
                     "document_id": chunk.document_id,
+                    "owner_id": owner_id,
                     "text": chunk.content,
                 }
             )

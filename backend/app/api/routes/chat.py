@@ -54,6 +54,7 @@ async def chat(
         db=db,
         chat_id=chat_id,
         query=query,
+        user_id=int(current_user["sub"]),
     )
 
     return {

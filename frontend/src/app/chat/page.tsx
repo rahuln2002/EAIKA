@@ -111,10 +111,6 @@ export default function ChatPage() {
     setQuery("");
   };
 
-  setSources(
-    response.sources || []
-  );
-
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">
@@ -161,6 +157,40 @@ export default function ChatPage() {
           </div>
         )}
       </div>
+
+      {/* ===================================== */}
+      {/* SOURCES */}
+      {/* ===================================== */}
+
+      {sources.length > 0 && (
+        <div className="mt-6 border rounded-lg p-4">
+          <h2 className="text-xl font-bold mb-4">
+            Sources
+          </h2>
+
+          {sources.map(
+            (source, idx) => (
+              <div
+                key={idx}
+                className="mb-4 border-b pb-2"
+              >
+                <div className="font-semibold">
+                  {source.citation}
+                </div>
+
+                <div className="text-sm text-gray-600">
+                  Document ID:{" "}
+                  {source.document_id}
+                </div>
+
+                <div className="mt-2 text-sm">
+                  {source.preview}
+                </div>
+              </div>
+            )
+          )}
+        </div>
+      )}
 
       {/* ========================================= */}
       {/* INPUT AREA */}

@@ -33,6 +33,7 @@ async def search(
     results = retrieval_service.retrieve_context(
         db=db,
         query=query,
+        user_id=int(current_user["sub"]),
     )
 
     return {

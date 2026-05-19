@@ -94,6 +94,7 @@ async def upload_document(
         db=db,
         document_id=document.id,
         text=cleaned_text,
+        owner_id=int(current_user["sub"]),
     )
 
     return {

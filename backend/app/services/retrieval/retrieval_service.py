@@ -10,6 +10,9 @@ from app.services.reranking.reranker_service import (
 from app.rag.retrievers.hybrid_retriever import (
     HybridRetriever,
 )
+from app.db.models.document import (
+    Document,
+)
 
 
 class RetrievalService:
@@ -27,6 +30,7 @@ class RetrievalService:
         self,
         db: Session,
         query: str,
+        user_id: int,
         top_k: int = 5,
         retrieval_k: int = 20,
     ) -> list[str]:
@@ -38,7 +42,10 @@ class RetrievalService:
         # GET DOCUMENT CORPUS
         # =============================================
 
-        documents = self.get_all_chunk_texts(db)
+        documents = self.get_user_chunk_texts(
+            db=db,
+            user_id=user_id,
+        )
 
         # =============================================
         # HYBRID RETRIEVER
@@ -80,14 +87,23 @@ class RetrievalService:
 
         return final_results
 
-    def get_all_chunk_texts(
+    def get_user_chunk_texts(
         self,
         db: Session,
+        user_id: int,
     ) -> list[str]:
         """
-        Retrieve all chunk texts.
+        Retrieve user-owned chunk texts.
         """
 
-        chunks = db.query(Chunk).all()
+        chunks = (
+            db.query(Chunk)
+            .join(
+                Document,
+                Chunk.document_id == Document.id,
+            )
+            .filter(Document.owner_id == user_id)
+            .all()
+        )
 
         return [chunk.content for chunk in chunks]
