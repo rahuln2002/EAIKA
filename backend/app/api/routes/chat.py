@@ -13,6 +13,9 @@ from app.api.dependencies.database import (
 from app.services.chat.chat_service import (
     ChatService,
 )
+from app.utils.citation_formatter import (
+    format_sources,
+)
 
 router = APIRouter(
     prefix="/chat",
@@ -55,7 +58,9 @@ async def chat(
 
     return {
         "chat_id": chat_id,
-        "response": response,
+        "answer": response["answer"],
+        "sources": format_sources(response["sources"]),
+        "evaluation": response["evaluation"],
     }
 
 

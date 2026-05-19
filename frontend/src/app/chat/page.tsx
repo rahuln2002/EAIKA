@@ -24,6 +24,9 @@ export default function ChatPage() {
   const websocketRef =
     useRef<WebSocket | null>(null);
 
+  const [sources, setSources] =
+    useState<any[]>([]);
+
   // =====================================================
   // CONNECT WEBSOCKET
   // =====================================================
@@ -107,6 +110,10 @@ export default function ChatPage() {
 
     setQuery("");
   };
+
+  setSources(
+    response.sources || []
+  );
 
   return (
     <div className="max-w-4xl mx-auto p-6">

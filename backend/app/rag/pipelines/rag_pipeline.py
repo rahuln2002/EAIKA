@@ -48,13 +48,15 @@ class RAGPipeline:
             top_k=top_k,
         )
 
+        context_texts = [chunk["content"] for chunk in context_chunks]
+
         # =================================================
         # BUILD CONVERSATIONAL PROMPT
         # =================================================
 
         prompt = build_rag_prompt(
             query=query,
-            context_chunks=context_chunks,
+            context_chunks=context_texts,
             conversation_history=conversation_history,
         )
 
@@ -68,19 +70,27 @@ class RAGPipeline:
         )
 
         # =============================================
+        # APPEND CITATIONS
+        # =============================================
+
+        citations = [chunk["citation"] for chunk in context_chunks]
+
+        cited_answer = answer + "\n\nSources: " + " ".join(citations)
+
+        # =============================================
         # RUN EVALUATION
         # =============================================
 
         evaluation = AnalyticsService.evaluate_response(
             query=query,
-            answer=answer,
-            retrieved_context=context_chunks,
+            answer=cited_answer,
+            retrieved_context=context_texts,
         )
 
         return {
             "query": query,
-            "answer": answer,
-            "retrieved_context": context_chunks,
+            "answer": cited_answer,
+            "retrieved_context": context_texts,
             "conversation_history": (conversation_history),
             "retrieval_strategy": ("hybrid+dense+rerank"),
             "evaluation": evaluation,

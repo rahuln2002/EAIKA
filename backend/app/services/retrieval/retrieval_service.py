@@ -61,7 +61,24 @@ class RetrievalService:
             top_k=top_k,
         )
 
-        return reranked_chunks
+        final_results = []
+
+        for idx, chunk_text in enumerate(reranked_chunks):
+            chunk = db.query(Chunk).filter(Chunk.content == chunk_text).first()
+
+            if not chunk:
+                continue
+
+            final_results.append(
+                {
+                    "chunk_id": chunk.id,
+                    "document_id": (chunk.document_id),
+                    "content": chunk.content,
+                    "citation": f"[{idx + 1}]",
+                }
+            )
+
+        return final_results
 
     def get_all_chunk_texts(
         self,
