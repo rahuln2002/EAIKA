@@ -11,6 +11,7 @@ starlette
 pydantic
 pydantic-settings
 python-dotenv
+pydantic[email]
 
 # =========================
 # DATABASE
@@ -48,6 +49,11 @@ sentence-transformers
 accelerate
 tokenizers
 tiktoken
+sentencepiece
+protobuf
+safetensors
+nltk
+scipy
 
 # =========================
 # LANGCHAIN / LLAMAINDEX
@@ -55,13 +61,11 @@ tiktoken
 langchain
 langchain-community
 langchain-core
-llama-index
 
 # =========================
-# OPENAI / LLM PROVIDERS
+# LLM PROVIDERS
 # =========================
-openai
-mistralai
+groq
 
 # =========================
 # REDIS / CACHE / TASK QUEUE
@@ -125,3 +129,16 @@ Pillow
 # PRODUCTION SERVER
 # =========================
 gunicorn
+
+# =========================
+# RANKING ALGORITHMS
+# =========================
+rank-bm25
+
+# =========================
+# OPENTELEMETRY
+# =========================
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-otlp
+opentelemetry-instrumentation-fastapi

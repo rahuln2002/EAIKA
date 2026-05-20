@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: eaika-frontend
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: eaika-frontend
+
+  template:
+    metadata:
+      labels:
+        app: eaika-frontend
+
+    spec:
+      containers:
+        - name: frontend
+
+          image: eaika-frontend:latest
+
+          ports:
+            - containerPort: 3000

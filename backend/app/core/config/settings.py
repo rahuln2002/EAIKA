@@ -70,8 +70,7 @@ class Settings(BaseSettings):
     # LLM PROVIDERS
     # =========================================================
 
-    OPENAI_API_KEY: str | None = None
-    MISTRAL_API_KEY: str | None = None
+    GROQ_API_KEY: str | None = None
 
     # =========================================================
     # EMBEDDINGS

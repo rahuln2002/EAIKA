@@ -1,9 +1,5 @@
 from fastapi import APIRouter
 
-from app.monitoring.healthcheck import (
-    healthcheck,
-)
-
 router = APIRouter(
     prefix="/health",
     tags=["Health"],
@@ -11,9 +7,12 @@ router = APIRouter(
 
 
 @router.get("/")
-async def health():
+async def health_check():
     """
-    Healthcheck endpoint.
+    Health check endpoint.
     """
 
-    return await healthcheck()
+    return {
+        "status": "healthy",
+        "service": "enterprise-ai-ka",
+    }

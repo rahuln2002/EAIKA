@@ -24,7 +24,7 @@ class RAGPipeline:
 
     def __init__(
         self,
-        provider: str = "openai",
+        provider: str = "groq",
     ) -> None:
         self.provider = provider
 

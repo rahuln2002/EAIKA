@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+
+  # ===================================================
+  # BACKEND
+  # ===================================================
+
+  backend:
+    build:
+      context: ../../backend
+    container_name: eaika-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../../backend/.env.local
+    depends_on:
+      - postgres
+      - redis
+      - qdrant
+
+  # ===================================================
+  # FRONTEND
+  # ===================================================
+
+  frontend:
+    build:
+      context: ../../frontend
+    container_name: eaika-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  # ===================================================
+  # POSTGRES
+  # ===================================================
+
+  postgres:
+    image: postgres:16
+    container_name: eaika-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: rahuln2002
+      POSTGRES_PASSWORD: Racer.co.in.123
+      POSTGRES_DB: eai_ka
+    ports:
+      - "5432:5432"
+
+  # ===================================================
+  # REDIS
+  # ===================================================
+
+  redis:
+    image: redis:7
+    container_name: eaika-redis
+    ports:
+      - "6379:6379"
+
+  # ===================================================
+  # QDRANT
+  # ===================================================
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: eaika-qdrant
+    ports:
+      - "6333:6333"
+
+  # ===================================================
+  # CELERY WORKER
+  # ===================================================
+
+  worker:
+    build:
+      context: ../../backend
+    command: celery -A app.workers.celery_workers.celery_app worker --loglevel=info --pool=solo
+    container_name: eaika-worker
+
+    env_file:
+    - ../../backend/.env.local
+
+    depends_on:
+      - redis
+      - backend

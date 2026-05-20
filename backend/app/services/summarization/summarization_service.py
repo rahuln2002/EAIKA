@@ -18,7 +18,7 @@ class SummarizationService:
     @staticmethod
     def summarize_text(
         text: str,
-        provider: str = "openai",
+        provider: str = "groq",
     ) -> str:
         """
         Summarize text directly.
@@ -36,7 +36,7 @@ class SummarizationService:
     @staticmethod
     def map_reduce_summarize(
         text: str,
-        provider: str = "openai",
+        provider: str = "groq",
     ) -> dict:
         """
         Perform hierarchical summarization.

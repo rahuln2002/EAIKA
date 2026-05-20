@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: eaika-backend
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: eaika-backend
+
+  template:
+    metadata:
+      labels:
+        app: eaika-backend
+
+    spec:
+      containers:
+        - name: backend
+
+          image: eaika-backend:latest
+
+          ports:
+            - containerPort: 8000

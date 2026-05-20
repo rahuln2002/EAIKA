@@ -1,11 +1,4 @@
-FROM python:3.12-slim
-
-# =====================================================
-# ENVIRONMENT
-# =====================================================
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+FROM node:20-alpine
 
 # =====================================================
 # WORKDIR
@@ -14,21 +7,16 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # =====================================================
-# SYSTEM DEPENDENCIES
+# COPY PACKAGE FILES
 # =====================================================
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+COPY package*.json ./
 
 # =====================================================
-# INSTALL PYTHON DEPENDENCIES
+# INSTALL DEPENDENCIES
 # =====================================================
 
-COPY requirements.txt .
-
-RUN pip install --no-cache-dir -r requirements.txt
+RUN npm install
 
 # =====================================================
 # COPY APPLICATION
@@ -37,13 +25,19 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # =====================================================
+# BUILD NEXT.JS APP
+# =====================================================
+
+RUN npm run build
+
+# =====================================================
 # EXPOSE PORT
 # =====================================================
 
-EXPOSE 8000
+EXPOSE 3000
 
 # =====================================================
 # START APPLICATION
 # =====================================================
 
-CMD ["sh", "start.sh"]
+CMD ["npm", "start"]
