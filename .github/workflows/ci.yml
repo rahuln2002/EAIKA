@@ -262,7 +262,7 @@ jobs:
 
       - name: Run Bandit Security Scan
         run: |
-          bandit -r backend/app
+          bandit -c backend/.bandit -r backend/app
 
       # ===================================================
       # STEP 3 — NODE SECURITY CHECK

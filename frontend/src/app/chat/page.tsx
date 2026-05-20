@@ -24,8 +24,14 @@ export default function ChatPage() {
   const websocketRef =
     useRef<WebSocket | null>(null);
 
-  const [sources, setSources] =
-    useState<any[]>([]);
+  type Source = {
+    citation: string;
+    document_id: number;
+    preview: string;
+  };
+
+  const [sources] =
+    useState<Source[]>([]);
 
   // =====================================================
   // CONNECT WEBSOCKET

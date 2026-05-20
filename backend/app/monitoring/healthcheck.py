@@ -4,6 +4,7 @@ from app.cache.redis_client import (
     get_redis_client,
 )
 from app.db.session import engine
+from app.monitoring.logging import logger
 
 
 async def healthcheck() -> dict:
@@ -27,8 +28,8 @@ async def healthcheck() -> dict:
 
         health_status["database"] = "healthy"
 
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Healthcheck failed: {e}")
 
     # =====================================================
     # REDIS HEALTH
@@ -41,7 +42,7 @@ async def healthcheck() -> dict:
 
         health_status["redis"] = "healthy"
 
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Healthcheck failed: {e}")
 
     return health_status

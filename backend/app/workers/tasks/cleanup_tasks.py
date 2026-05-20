@@ -3,6 +3,7 @@ import os
 from app.workers.celery_workers import (
     celery_app,
 )
+from app.monitoring.logging import logger
 
 TEMP_DIRECTORY = "data/temp"
 
@@ -25,7 +26,7 @@ def cleanup_temp_files():
         try:
             os.remove(file_path)
 
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Cleanup task failed: {e}")
 
     return {"status": "cleanup completed"}
