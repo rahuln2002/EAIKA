@@ -1,29 +1,274 @@
-name: CI
+name: Enterprise AI KA CI
+
+# =========================================================
+# TRIGGERS
+# =========================================================
 
 on:
   push:
+    branches:
+      - main
+      - develop
+
   pull_request:
+    branches:
+      - main
+      - develop
+
+# =========================================================
+# JOBS
+# =========================================================
 
 jobs:
-  test:
+
+  # =======================================================
+  # BACKEND CI
+  # =======================================================
+
+  backend:
+
+    name: Backend CI
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+
+      # ===================================================
+      # STEP 1 — CHECKOUT REPOSITORY
+      # ===================================================
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ===================================================
+      # STEP 2 — SETUP PYTHON
+      # ===================================================
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # ===================================================
+      # STEP 3 — CACHE PIP
+      # ===================================================
+
+      - name: Cache Pip Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: >
+            ${{ runner.os }}-pip-${{
+            hashFiles('backend/requirements.txt')
+            }}
+
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # ===================================================
+      # STEP 4 — INSTALL DEPENDENCIES
+      # ===================================================
+
+      - name: Install Backend Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ===================================================
+      # STEP 5 — INSTALL DEV TOOLS
+      # ===================================================
+
+      - name: Install Dev Tools
+        run: |
+          pip install black
+          pip install ruff
+          pip install pytest
+          pip install bandit
+      # ===================================================
+      # STEP 6 — RUN RUFF LINT
+      # ===================================================
+
+      - name: Run Ruff Lint
+        run: |
+          ruff check .
+
+      # ===================================================
+      # STEP 7 — RUN BLACK FORMAT CHECK
+      # ===================================================
+
+      - name: Run Black Format Check
+        run: |
+          black --check .
+
+      # ===================================================
+      # STEP 8 — RUN PYTEST
+      # ===================================================
+
+      - name: Run Backend Tests
+        run: |
+          pytest
+
+  # =======================================================
+  # FRONTEND CI
+  # =======================================================
+
+  frontend:
+
+    name: Frontend CI
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+
+      # ===================================================
+      # STEP 1 — CHECKOUT REPOSITORY
+      # ===================================================
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ===================================================
+      # STEP 2 — SETUP NODE.JS
+      # ===================================================
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # ===================================================
+      # STEP 3 — CACHE NODE MODULES
+      # ===================================================
+
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            frontend/node_modules
+
+          key: >
+            ${{ runner.os }}-node-${{
+            hashFiles('frontend/package-lock.json')
+            }}
+
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # ===================================================
+      # STEP 4 — INSTALL DEPENDENCIES
+      # ===================================================
+
+      - name: Install Frontend Dependencies
+        run: |
+          npm install
+
+      # ===================================================
+      # STEP 5 — RUN ESLINT
+      # ===================================================
+
+      - name: Run ESLint
+        run: |
+          npm run lint
+
+      # ===================================================
+      # STEP 6 — BUILD NEXT.JS APP
+      # ===================================================
+
+      - name: Build Frontend
+        run: |
+          npm run build
+
+  # =======================================================
+  # DOCKER VALIDATION
+  # =======================================================
+
+  docker:
+
+    name: Docker Build Validation
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      # ===================================================
+      # STEP 1 — CHECKOUT REPOSITORY
+      # ===================================================
 
-      - name: Install dependencies
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ===================================================
+      # STEP 2 — SETUP DOCKER BUILDX
+      # ===================================================
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ===================================================
+      # STEP 3 — BUILD BACKEND IMAGE
+      # ===================================================
+
+      - name: Build Backend Docker Image
         run: |
-          pip install -e .[dev]
+          docker build \
+          -t eaika-backend \
+          ./backend
 
-      - name: Lint
-        run: ruff check .
+      # ===================================================
+      # STEP 4 — BUILD FRONTEND IMAGE
+      # ===================================================
 
-      - name: Format Check
-        run: black --check .
+      - name: Build Frontend Docker Image
+        run: |
+          docker build \
+          -t eaika-frontend \
+          ./frontend
 
-      - name: Run Tests
-        run: pytest
+  # =======================================================
+  # SECURITY CHECKS
+  # =======================================================
+
+  security:
+
+    name: Security Checks
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ===================================================
+      # STEP 1 — CHECKOUT REPOSITORY
+      # ===================================================
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ===================================================
+      # STEP 2 — PYTHON SECURITY CHECK
+      # ===================================================
+
+      - name: Install Bandit
+        run: |
+          pip install bandit
+
+      - name: Run Bandit Security Scan
+        run: |
+          bandit -r backend/app
+
+      # ===================================================
+      # STEP 3 — NODE SECURITY CHECK
+      # ===================================================
+
+      - name: Run npm audit
+        working-directory: frontend
+        run: |
+          npm audit --audit-level=high

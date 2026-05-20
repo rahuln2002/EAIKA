@@ -1,3 +1,4 @@
+![CI](https://github.com/rahuln2002/EAIKA/actions/workflows/ci.yml/badge.svg)
 # Enterprise AI Knowledge Assistant (EAIKA)
 
 Production-grade Enterprise RAG Platform with Hybrid Retrieval, Cross-Encoder Reranking, Streaming AI Chat, Summarization, Observability, and Multi-Tenant Architecture.

@@ -118,6 +118,7 @@ black
 ruff
 mypy
 pre-commit
+bandit
 
 # =========================
 # OPTIONAL OCR SUPPORT
