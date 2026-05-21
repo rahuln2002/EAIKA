@@ -24,8 +24,8 @@ class QdrantStore:
         self.embedding_dimension = embedding_dimension
 
         self.client = QdrantClient(
-            host=settings.QDRANT_HOST,
-            port=settings.QDRANT_PORT,
+            url=settings.QDRANT_URL,
+            api_key=(settings.QDRANT_API_KEY if settings.QDRANT_API_KEY else None),
         )
 
         self._create_collection()

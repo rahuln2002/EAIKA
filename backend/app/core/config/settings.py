@@ -1,7 +1,6 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -41,9 +40,7 @@ class Settings(BaseSettings):
     # DATABASE
     # =========================================================
 
-    DATABASE_URL: str = Field(
-        default="postgresql://postgres:postgres@localhost:5432/eai_ka"
-    )
+    DATABASE_URL: str
 
     # =========================================================
     # REDIS
@@ -63,8 +60,8 @@ class Settings(BaseSettings):
     # VECTOR DATABASE
     # =========================================================
 
-    QDRANT_HOST: str = "localhost"
-    QDRANT_PORT: int = 6333
+    QDRANT_URL: str
+    QDRANT_API_KEY: str
 
     # =========================================================
     # LLM PROVIDERS
