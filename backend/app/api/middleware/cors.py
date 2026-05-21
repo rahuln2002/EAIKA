@@ -10,6 +10,7 @@ def setup_cors(app: FastAPI) -> None:
     origins = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://eaika.vercel.app",
     ]
 
     app.add_middleware(
