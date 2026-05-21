@@ -2,7 +2,7 @@
 
 echo "Waiting for PostgreSQL..."
 
-sleep 5
+sleep 15
 
 echo "Running Alembic migrations..."
 
