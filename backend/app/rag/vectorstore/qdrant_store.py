@@ -87,10 +87,10 @@ class QdrantStore:
         Search vector similarity.
         """
 
-        results = self.client.query_points(
+        results = self.client.search(
             collection_name=self.COLLECTION_NAME,
-            query=query_embedding,
+            query_vector=query_embedding,
             limit=top_k,
-        ).points
+        )
 
         return results
