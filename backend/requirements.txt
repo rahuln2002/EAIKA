@@ -54,6 +54,7 @@ protobuf
 safetensors
 nltk
 scipy
+fastembed
 
 # =========================
 # LANGCHAIN / LLAMAINDEX

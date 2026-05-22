@@ -1,6 +1,12 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from typing import Optional
+from typing import Any
+
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+)
 
 # =========================================================
 # CHAT CREATE
@@ -12,12 +18,53 @@ class ChatCreate(BaseModel):
 
 
 # =========================================================
+# CHAT REQUEST
+# =========================================================
+
+
+class ChatRequest(BaseModel):
+    query: str
+
+    chat_id: Optional[int] = None
+
+
+# =========================================================
 # MESSAGE CREATE
 # =========================================================
 
 
 class MessageCreate(BaseModel):
     content: str
+
+
+# =========================================================
+# SOURCE RESPONSE
+# =========================================================
+
+
+class SourceResponse(BaseModel):
+    chunk_id: int
+
+    document_id: int
+
+    citation: str
+
+    content: str
+
+
+# =========================================================
+# EVALUATION RESPONSE
+# =========================================================
+
+
+class EvaluationResponse(BaseModel):
+    faithfulness: float
+
+    hallucination: float
+
+    relevancy: float
+
+    retrieval_metrics: dict[str, Any]
 
 
 # =========================================================
@@ -31,8 +78,11 @@ class MessageResponse(BaseModel):
     )
 
     id: int
+
     role: str
+
     content: str
+
     created_at: datetime
 
 
@@ -47,5 +97,46 @@ class ChatResponse(BaseModel):
     )
 
     id: int
+
     title: str
+
+    created_at: datetime
+
+
+# =========================================================
+# CONVERSATIONAL CHAT RESPONSE
+# =========================================================
+
+
+class ConversationalChatResponse(BaseModel):
+    chat_id: int
+
+    answer: str
+
+    sources: list[SourceResponse]
+
+    evaluation: EvaluationResponse
+
+
+# =========================================================
+# CHAT HISTORY RESPONSE
+# =========================================================
+
+
+class ChatHistoryResponse(BaseModel):
+    chat_id: int
+
+    messages: list[MessageResponse]
+
+
+# =========================================================
+# CHAT LIST RESPONSE
+# =========================================================
+
+
+class ChatListResponse(BaseModel):
+    id: int
+
+    title: str
+
     created_at: datetime

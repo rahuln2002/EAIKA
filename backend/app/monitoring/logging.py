@@ -26,6 +26,7 @@ def log_warning(message: str):
 
 def log_error(
     error: Exception,
-    path: str | None = None,
+    method: str = "",
+    path: str = "",
 ):
-    logger.error(f"Error: {error} | Path: {path}")
+    logger.error((f"{method} {path} Error: {str(error)}"))

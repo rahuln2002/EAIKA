@@ -1,29 +1,19 @@
-export const createWebSocket = () => {
+export const createWebSocket = (
+  chatId?: number | null
+) => {
 
   const token =
     localStorage.getItem(
       "access_token"
     );
 
-  // ============================================
-  // BASE WS URL
-  // ============================================
+  let url =
+    `${process.env.NEXT_PUBLIC_WS_URL}/ws/chat?token=${token}`;
 
-  const baseUrl =
-    process.env
-      .NEXT_PUBLIC_WS_URL;
+  if (chatId) {
 
-  if (!baseUrl) {
-    throw new Error(
-      "NEXT_PUBLIC_WS_URL is not defined"
-    );
+    url += `&chat_id=${chatId}`;
   }
 
-  // ============================================
-  // CREATE WEBSOCKET
-  // ============================================
-
-  return new WebSocket(
-    `${baseUrl}/ws/chat?token=${token}`
-  );
+  return new WebSocket(url);
 };
