@@ -4,6 +4,8 @@ from app.core.config.settings import (
     settings,
 )
 
+from app.monitoring.logging import logger
+
 
 class GroqService:
     """
@@ -22,6 +24,8 @@ class GroqService:
         Generate normal response.
         """
 
+        logger.info("Sending Groq request...")
+
         completion = cls.client.chat.completions.create(
             model=model,
             messages=[
@@ -32,6 +36,8 @@ class GroqService:
             ],
             temperature=0.7,
         )
+
+        logger.info("Groq response received")
 
         return completion.choices[0].message.content
 
@@ -45,6 +51,7 @@ class GroqService:
         Stream response tokens.
         """
 
+        logger.info("Streaming Groq request...")
         stream = cls.client.chat.completions.create(
             model=model,
             messages=[
@@ -62,3 +69,5 @@ class GroqService:
 
             if delta and delta.content:
                 yield delta.content
+
+        logger.info("Groq response streamed")

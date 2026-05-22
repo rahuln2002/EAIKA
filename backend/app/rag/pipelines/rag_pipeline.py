@@ -15,6 +15,7 @@ from app.services.analytics.analytics_service import (
 from app.telemetry.observability import (
     trace_function,
 )
+from app.monitoring.logging import logger
 
 
 class RAGPipeline:
@@ -43,61 +44,65 @@ class RAGPipeline:
         Execute conversational RAG pipeline.
         """
 
-        # =================================================
-        # RETRIEVE CONTEXT
-        # =================================================
+        try:
+            # =================================================
+            # RETRIEVE CONTEXT
+            # =================================================
 
-        context_chunks = self.retrieval_service.retrieve_context(
-            db=db,
-            query=query,
-            user_id=user_id,
-            top_k=top_k,
-        )
+            context_chunks = self.retrieval_service.retrieve_context(
+                db=db,
+                query=query,
+                user_id=user_id,
+                top_k=top_k,
+            )
 
-        context_texts = [chunk["content"] for chunk in context_chunks]
+            context_texts = [chunk["content"] for chunk in context_chunks]
 
-        # =================================================
-        # BUILD CONVERSATIONAL PROMPT
-        # =================================================
+            # =================================================
+            # BUILD CONVERSATIONAL PROMPT
+            # =================================================
 
-        prompt = build_rag_prompt(
-            query=query,
-            context_chunks=context_texts,
-            conversation_history=conversation_history,
-        )
+            prompt = build_rag_prompt(
+                query=query,
+                context_chunks=context_texts,
+                conversation_history=conversation_history,
+            )
 
-        # =================================================
-        # GENERATE RESPONSE
-        # =================================================
+            # =================================================
+            # GENERATE RESPONSE
+            # =================================================
 
-        answer = ProviderManager.generate_response(
-            provider=self.provider,
-            prompt=prompt,
-        )
+            answer = ProviderManager.generate_response(
+                provider=self.provider,
+                prompt=prompt,
+            )
 
-        # =============================================
-        # APPEND CITATIONS
-        # =============================================
+            # =============================================
+            # APPEND CITATIONS
+            # =============================================
 
-        citations = [chunk["citation"] for chunk in context_chunks]
+            citations = [chunk["citation"] for chunk in context_chunks]
 
-        cited_answer = answer + "\n\nSources: " + " ".join(citations)
+            cited_answer = answer + "\n\nSources: " + " ".join(citations)
 
-        # =============================================
-        # RUN EVALUATION
-        # =============================================
+            # =============================================
+            # RUN EVALUATION
+            # =============================================
 
-        evaluation = AnalyticsService.evaluate_response(
-            query=query,
-            answer=cited_answer,
-            retrieved_context=context_texts,
-        )
+            evaluation = AnalyticsService.evaluate_response(
+                query=query,
+                answer=cited_answer,
+                retrieved_context=context_texts,
+            )
 
-        return {
-            "query": query,
-            "answer": cited_answer,
-            "retrieved_context": context_texts,
-            "conversation_history": (conversation_history),
-            "retrieval_strategy": ("hybrid+dense+rerank"),
-            "evaluation": evaluation,
-        }
+            return {
+                "query": query,
+                "answer": cited_answer,
+                "retrieved_context": context_texts,
+                "conversation_history": (conversation_history),
+                "retrieval_strategy": ("hybrid+dense+rerank"),
+                "evaluation": evaluation,
+            }
+        except Exception as e:
+            logger.exception(e)
+            raise e
