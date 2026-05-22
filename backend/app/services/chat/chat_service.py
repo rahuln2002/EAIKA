@@ -18,7 +18,7 @@ class ChatService:
     def create_chat(
         db: Session,
         user_id: int,
-        title: str = "New Chat",
+        # title: str = "New Chat",
     ) -> Chat:
         """
         Create chat session.
@@ -26,7 +26,7 @@ class ChatService:
 
         chat = Chat(
             user_id=user_id,
-            title=title,
+            # title=title,
         )
 
         db.add(chat)
@@ -184,7 +184,7 @@ class ChatService:
         return [
             {
                 "id": chat.id,
-                "title": chat.title,
+                # "title": chat.title,
             }
             for chat in chats
         ]
