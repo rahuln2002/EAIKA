@@ -1,6 +1,6 @@
 from qdrant_client import (
     QdrantClient,
-    models,
+    # models,
 )
 from qdrant_client.models import (
     Distance,
@@ -38,6 +38,13 @@ class QdrantStore:
         """
         Create Qdrant collection.
         """
+
+        try:
+            self.client.delete_collection(
+                collection_name=self.COLLECTION_NAME,
+            )
+        except Exception:
+            pass
 
         collections = self.client.get_collections()
 
@@ -89,12 +96,10 @@ class QdrantStore:
         Search vector similarity.
         """
 
-        results = self.client.query_points(
+        response = self.client.query_points(
             collection_name=self.COLLECTION_NAME,
-            query=models.NearestQuery(
-                nearest=query_embedding,
-            ),
+            query=query_embedding,
             limit=top_k,
-        ).points
+        )
 
-        return results
+        return response.points
