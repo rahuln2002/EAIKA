@@ -43,8 +43,8 @@ class QdrantStore:
             self.client.delete_collection(
                 collection_name=self.COLLECTION_NAME,
             )
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Error occurred while deleting collection: {e}")
 
         collections = self.client.get_collections()
 
