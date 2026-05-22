@@ -27,7 +27,7 @@ class EmbeddingManager:
             cls.MAX_EMBEDDING_TOKENS,
         )
 
-        return EmbeddingService.generate_embedding(cleaned_text)
+        return EmbeddingService.generate_embeddings(cleaned_text)
 
     @classmethod
     def embed_texts(
