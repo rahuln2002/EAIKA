@@ -43,9 +43,9 @@ faiss-cpu
 # =========================
 # AI / LLM / NLP
 # =========================
-# torch
+torch
 transformers
-# sentence-transformers
+sentence-transformers
 accelerate
 tokenizers
 tiktoken
