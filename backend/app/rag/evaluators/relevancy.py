@@ -5,6 +5,21 @@ from sentence_transformers import (
 from app.core.config.settings import settings
 
 
+def get_embedding_model():
+    """
+    Lazy-load embedding model.
+    """
+
+    global embedding_model
+
+    if embedding_model is None:
+        embedding_model = SentenceTransformer(
+            settings.EMBEDDING_MODEL,
+        )
+
+    return embedding_model
+
+
 class RelevancyEvaluator:
     """
     Retrieval relevancy evaluator.
@@ -19,7 +34,7 @@ class RelevancyEvaluator:
         Evaluate retrieval relevance.
         """
 
-        model = SentenceTransformer(settings.EMBEDDING_MODEL)
+        model = get_embedding_model()
 
         if not retrieved_context:
             return {"avg_relevancy_score": 0.0}
