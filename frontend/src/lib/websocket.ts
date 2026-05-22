@@ -24,6 +24,6 @@ export const createWebSocket = () => {
   // ============================================
 
   return new WebSocket(
-    `${baseUrl}/api/v1/ws/chat?token=${token}`
+    `${baseUrl}/ws/chat?token=${token}`
   );
 };

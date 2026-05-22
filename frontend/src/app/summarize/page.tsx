@@ -21,7 +21,7 @@ export default function SummarizePage() {
 
         const response =
           await axios.post(
-            "http://localhost:8000/api/v1/summarization",
+            `${process.env.NEXT_PUBLIC_API_URL}/summarization/`,
             null,
             {
               params: { text },

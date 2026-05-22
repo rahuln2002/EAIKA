@@ -7,7 +7,7 @@ export const uploadDocument =
     formData.append("file", file);
 
     const response = await api.post(
-      "/upload",
+      "/upload/",
       formData,
       {
         headers: {
