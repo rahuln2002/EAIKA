@@ -28,6 +28,8 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt .
 
+ENV PIP_NO_CACHE_DIR=1
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # =====================================================
@@ -47,4 +49,4 @@ EXPOSE 8000
 # =====================================================
 RUN chmod +x start.sh
 
-CMD ["sh", "start.sh"]
+CMD ["./start.sh"]

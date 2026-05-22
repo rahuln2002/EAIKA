@@ -9,9 +9,9 @@ class RelevancyEvaluator:
     Retrieval relevancy evaluator.
     """
 
-    MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+    MODEL_NAME = "sentence-transformers/paraphrase-MiniLM-L3-v2"
 
-    model = SentenceTransformer(MODEL_NAME)
+    model = None
 
     @classmethod
     def evaluate(
@@ -22,6 +22,9 @@ class RelevancyEvaluator:
         """
         Evaluate retrieval relevance.
         """
+
+        if cls.model is None:
+            cls.model = SentenceTransformer(cls.MODEL_NAME)
 
         if not retrieved_context:
             return {"avg_relevancy_score": 0.0}
