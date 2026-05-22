@@ -2,6 +2,7 @@ from sentence_transformers import (
     SentenceTransformer,
     util,
 )
+from app.core.config.settings import settings
 
 
 class RelevancyEvaluator:
@@ -9,13 +10,8 @@ class RelevancyEvaluator:
     Retrieval relevancy evaluator.
     """
 
-    MODEL_NAME = "sentence-transformers/paraphrase-MiniLM-L3-v2"
-
-    model = None
-
     @classmethod
     def evaluate(
-        cls,
         query: str,
         retrieved_context: list[str],
     ) -> dict:
@@ -23,18 +19,17 @@ class RelevancyEvaluator:
         Evaluate retrieval relevance.
         """
 
-        if cls.model is None:
-            cls.model = SentenceTransformer(cls.MODEL_NAME)
+        model = SentenceTransformer(settings.EMBEDDING_MODEL)
 
         if not retrieved_context:
             return {"avg_relevancy_score": 0.0}
 
-        query_embedding = cls.model.encode(query)
+        query_embedding = model.encode(query)
 
         scores = []
 
         for chunk in retrieved_context:
-            chunk_embedding = cls.model.encode(chunk)
+            chunk_embedding = model.encode(chunk)
 
             similarity = util.cos_sim(
                 query_embedding,

@@ -1,4 +1,6 @@
-from fastembed import TextEmbedding
+from sentence_transformers import (
+    SentenceTransformer,
+)
 
 from app.core.config.settings import settings
 
@@ -17,8 +19,8 @@ def get_embedding_model():
     global embedding_model
 
     if embedding_model is None:
-        embedding_model = TextEmbedding(
-            model_name=settings.EMBEDDING_MODEL,
+        embedding_model = SentenceTransformer(
+            settings.EMBEDDING_MODEL,
         )
 
     return embedding_model
@@ -30,14 +32,17 @@ class EmbeddingService:
         texts: list[str],
     ) -> list[list[float]]:
         """
-        Generate embeddings for documents.
+        Generate document embeddings.
         """
 
         model = get_embedding_model()
 
-        embeddings = list(model.embed(texts))
+        embeddings = model.encode(
+            texts,
+            convert_to_numpy=True,
+        )
 
-        return [embedding.tolist() for embedding in embeddings]
+        return embeddings.tolist()
 
     @staticmethod
     def generate_query_embedding(
@@ -49,6 +54,9 @@ class EmbeddingService:
 
         model = get_embedding_model()
 
-        embedding = list(model.embed([query]))[0]
+        embedding = model.encode(
+            query,
+            convert_to_numpy=True,
+        )
 
         return embedding.tolist()

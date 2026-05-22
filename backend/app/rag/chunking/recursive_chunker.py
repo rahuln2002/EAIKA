@@ -10,8 +10,8 @@ class RecursiveChunker:
 
     def __init__(
         self,
-        chunk_size: int = 700,
-        chunk_overlap: int = 100,
+        chunk_size: int = 500,
+        chunk_overlap: int = 50,
     ) -> None:
         self.chunk_size = chunk_size
 
