@@ -4,9 +4,10 @@ from app.db.models.chunk import Chunk
 from app.rag.retrievers.dense_retriever import (
     DenseRetriever,
 )
-from app.services.reranking.reranker_service import (
-    RerankerService,
-)
+
+# from app.services.reranking.reranker_service import (
+#     RerankerService,
+# )
 from app.rag.retrievers.hybrid_retriever import (
     HybridRetriever,
 )
@@ -62,30 +63,30 @@ class RetrievalService:
         # RERANK RESULTS
         # =============================================
 
-        reranked_chunks = RerankerService.rerank(
-            query=query,
-            documents=retrieved_chunks,
-            top_k=top_k,
-        )
+        # reranked_chunks = RerankerService.rerank(
+        #     query=query,
+        #     documents=retrieved_chunks,
+        #     top_k=top_k,
+        # )
 
-        final_results = []
+        # final_results = []
 
-        for idx, chunk_text in enumerate(reranked_chunks):
-            chunk = db.query(Chunk).filter(Chunk.content == chunk_text).first()
+        # for idx, chunk_text in enumerate(reranked_chunks):
+        #     chunk = db.query(Chunk).filter(Chunk.content == chunk_text).first()
 
-            if not chunk:
-                continue
+        #     if not chunk:
+        #         continue
 
-            final_results.append(
-                {
-                    "chunk_id": chunk.id,
-                    "document_id": (chunk.document_id),
-                    "content": chunk.content,
-                    "citation": f"[{idx + 1}]",
-                }
-            )
+        #     final_results.append(
+        #         {
+        #             "chunk_id": chunk.id,
+        #             "document_id": (chunk.document_id),
+        #             "content": chunk.content,
+        #             "citation": f"[{idx + 1}]",
+        #         }
+        #     )
 
-        return final_results
+        return retrieved_chunks
 
     def get_user_chunk_texts(
         self,

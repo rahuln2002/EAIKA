@@ -25,7 +25,7 @@ class ChatService:
         """
 
         chat = Chat(
-            owner_id=user_id,
+            user_id=user_id,
             title=title,
         )
 
@@ -51,7 +51,7 @@ class ChatService:
             db.query(Chat)
             .filter(
                 Chat.id == chat_id,
-                Chat.owner_id == user_id,
+                Chat.user_id == user_id,
             )
             .first()
         )
@@ -178,10 +178,7 @@ class ChatService:
         """
 
         chats = (
-            db.query(Chat)
-            .filter(Chat.owner_id == user_id)
-            .order_by(desc(Chat.id))
-            .all()
+            db.query(Chat).filter(Chat.user_id == user_id).order_by(desc(Chat.id)).all()
         )
 
         return [
