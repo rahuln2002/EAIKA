@@ -40,6 +40,10 @@ from app.websockets.connection_manager import (
     ConnectionManager,
 )
 
+from app.monitoring.logging import (
+    logger,
+)
+
 # =====================================================
 # WS MANAGER
 # =====================================================
@@ -198,20 +202,6 @@ class WebSocketHandler:
                 )
 
                 # =============================================
-                # ANALYTICS
-                # =============================================
-
-                response_time = time.time() - start_time
-
-                AnalyticsService.log_analytics(
-                    db=db,
-                    user_id=user_id,
-                    query=query,
-                    response_time=response_time,
-                    retrieved_chunks=len(retrieved_chunks),
-                )
-
-                # =============================================
                 # SEND SOURCES
                 # =============================================
 
@@ -228,6 +218,23 @@ class WebSocketHandler:
                     websocket,
                 )
 
+                # =============================================
+                # ANALYTICS
+                # =============================================
+
+                response_time = time.time() - start_time
+
+                try:
+                    AnalyticsService.log_analytics(
+                        db=db,
+                        user_id=user_id,
+                        query=query,
+                        response_time=response_time,
+                        retrieved_chunks=len(retrieved_chunks),
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to log analytics: {e}")
+
         except JWTError:
             await websocket.close(code=4001)
 
@@ -235,7 +242,18 @@ class WebSocketHandler:
             manager.disconnect(websocket)
 
         except Exception as e:
-            print(f"WebSocket Error: {e}")
+            logger.warning(f"WebSocket Error: {e}")
+
+            await websocket.send_json(
+                {
+                    "type": "error",
+                    "data": str(e),
+                }
+            )
+
+            await manager.send_end(
+                websocket,
+            )
 
             await websocket.close(code=1011)
 

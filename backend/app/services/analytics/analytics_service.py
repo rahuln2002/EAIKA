@@ -70,7 +70,7 @@ class AnalyticsService:
         """
 
         analytics = Analytics(
-            owner_id=user_id,
+            user_id=user_id,
             query=query,
             response_time=response_time,
             retrieved_chunks=retrieved_chunks,

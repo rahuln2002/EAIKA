@@ -68,6 +68,15 @@ export default function ChatPage() {
             event.data
           );
 
+        if (parsed.type === "error") {
+
+          console.error(parsed.data);
+
+          setStreaming(false);
+
+          return;
+        }
+
         // ========================
         // CHAT ID
         // ========================
