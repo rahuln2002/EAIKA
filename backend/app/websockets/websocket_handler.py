@@ -281,7 +281,7 @@ class WebSocketHandler:
                 )
 
             except Exception:
-                pass
+                logger.warning("Failed to send error message to client.")
 
             manager.disconnect(websocket)
 
