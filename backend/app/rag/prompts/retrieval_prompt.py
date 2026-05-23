@@ -20,7 +20,9 @@ def build_rag_prompt(
         for chunk in context_chunks
     )
 
-    history = "\n".join(f"{msg.role}: {msg.content}" for msg in conversation_history)
+    history = "\n".join(
+        f"{msg['role']}: {msg['content']}" for msg in conversation_history
+    )
 
     prompt = f"""
 {SYSTEM_PROMPT}
