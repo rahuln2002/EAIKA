@@ -1,4 +1,5 @@
 import time
+import traceback
 
 from fastapi import (
     WebSocket,
@@ -81,11 +82,13 @@ class WebSocketHandler:
                 algorithms=["HS256"],
             )
 
-            user_id = int(payload.get("sub"))
+            sub = payload.get("sub")
 
-            if not user_id:
+            if sub is None:
                 await websocket.close(code=4001)
                 return
+
+            user_id = int(sub)
 
             # =================================================
             # CHAT SESSION
@@ -119,7 +122,7 @@ class WebSocketHandler:
 
             retrieval_service = RetrievalService()
 
-            while True:
+            while websocket.client_state.name == "CONNECTED":
                 query = await websocket.receive_text()
 
                 start_time = time.time()
@@ -134,12 +137,6 @@ class WebSocketHandler:
                     user_id=user_id,
                     top_k=5,
                 )
-
-                # =============================================
-                # CONTEXT EXTRACTION
-                # =============================================
-
-                context_chunks = [chunk["content"] for chunk in retrieved_chunks]
 
                 # =============================================
                 # CONVERSATION HISTORY
@@ -167,7 +164,7 @@ class WebSocketHandler:
 
                 prompt = build_rag_prompt(
                     query=query,
-                    context_chunks=context_chunks,
+                    context_chunks=retrieved_chunks,
                     conversation_history=(conversation_history),
                 )
 
@@ -182,12 +179,33 @@ class WebSocketHandler:
 
                 full_response = ""
 
+                buffer = ""
+
                 for token in stream:
                     full_response += token
 
+                    buffer += token
+
+                    # =========================================
+                    # STREAM BUFFER
+                    # =========================================
+
+                    if len(buffer) >= 20:
+                        await manager.send_token(
+                            websocket,
+                            buffer,
+                        )
+
+                        buffer = ""
+
+                # =============================================
+                # SEND REMAINING BUFFER
+                # =============================================
+
+                if buffer:
                     await manager.send_token(
                         websocket,
-                        token,
+                        buffer,
                     )
 
                 # =============================================
@@ -242,20 +260,30 @@ class WebSocketHandler:
             manager.disconnect(websocket)
 
         except Exception as e:
+            traceback.print_exc()
+
             logger.warning(f"WebSocket Error: {e}")
 
-            await websocket.send_json(
-                {
-                    "type": "error",
-                    "data": str(e),
-                }
-            )
+            try:
+                await websocket.send_json(
+                    {
+                        "type": "error",
+                        "data": str(e),
+                    }
+                )
 
-            await manager.send_end(
-                websocket,
-            )
+                await manager.send_end(
+                    websocket,
+                )
 
-            await websocket.close(code=1011)
+                await websocket.close(
+                    code=1011,
+                )
+
+            except Exception:
+                pass
+
+            manager.disconnect(websocket)
 
         finally:
             db.close()

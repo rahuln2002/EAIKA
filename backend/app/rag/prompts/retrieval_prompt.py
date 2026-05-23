@@ -5,16 +5,22 @@ from app.rag.prompts.system_prompt import (
 
 def build_rag_prompt(
     query: str,
-    context_chunks: list[str],
-    conversation_history: list[str],
+    context_chunks: list[dict],
+    conversation_history: list,
 ) -> str:
     """
     Build conversational RAG prompt.
     """
 
-    context = "\n\n".join(context_chunks)
+    context = "\n\n".join(
+        chunk.get(
+            "content",
+            "",
+        )
+        for chunk in context_chunks
+    )
 
-    history = "\n".join(conversation_history)
+    history = "\n".join(f"{msg.role}: {msg.content}" for msg in conversation_history)
 
     prompt = f"""
 {SYSTEM_PROMPT}

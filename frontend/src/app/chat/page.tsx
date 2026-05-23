@@ -26,11 +26,17 @@ export default function ChatPage() {
   const websocketRef =
     useRef<WebSocket | null>(null);
 
+  const bottomRef =
+    useRef<HTMLDivElement | null>(
+      null
+    );
+
   // ===================================================
   // GLOBAL STORE
   // ===================================================
 
   const {
+
     setChatId,
 
     messages,
@@ -47,112 +53,16 @@ export default function ChatPage() {
   } = useChatStore();
 
   // ===================================================
-  // CONNECT WEBSOCKET
+  // AUTO SCROLL
   // ===================================================
 
   useEffect(() => {
 
-    const ws =
-      createWebSocket();
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
 
-    websocketRef.current = ws;
-
-    ws.onmessage = (
-      event
-    ) => {
-
-      try {
-
-        const parsed =
-          JSON.parse(
-            event.data
-          );
-
-        if (parsed.type === "error") {
-
-          console.error(parsed.data);
-
-          setStreaming(false);
-
-          return;
-        }
-
-        // ========================
-        // CHAT ID
-        // ========================
-
-        if (
-          parsed.type ===
-          "chat_id"
-        ) {
-
-          setChatId(
-            parsed.data
-          );
-
-          return;
-        }
-
-        // ========================
-        // SOURCES
-        // ========================
-
-        if (
-          parsed.type ===
-          "sources"
-        ) {
-
-          setSources(
-            parsed.data
-          );
-
-          return;
-        }
-
-        // ========================
-        // END
-        // ========================
-
-        if (
-          parsed.type ===
-          "end"
-        ) {
-
-          setStreaming(
-            false
-          );
-
-          return;
-        }
-
-        // ========================
-        // TOKEN
-        // ========================
-
-        if (
-          parsed.type ===
-          "token"
-        ) {
-
-          addStreamingToken(
-            parsed.data
-          );
-        }
-
-      } catch (error) {
-
-        console.error(
-          error
-        );
-      }
-    };
-
-    return () => {
-
-      ws.close();
-    };
-
-  }, []);
+  }, [messages, streaming]);
 
   // ===================================================
   // STREAM TOKEN APPENDER
@@ -173,6 +83,10 @@ export default function ChatPage() {
           updated[
             updated.length - 1
           ];
+
+        // =============================================
+        // APPEND TO LAST ASSISTANT MESSAGE
+        // =============================================
 
         if (
           last &&
@@ -197,30 +111,207 @@ export default function ChatPage() {
   };
 
   // ===================================================
+  // MESSAGE HANDLER
+  // ===================================================
+
+  const handleMessage = (
+    event: MessageEvent
+  ) => {
+
+    try {
+
+      const parsed =
+        JSON.parse(
+          event.data
+        );
+
+      // =============================================
+      // ERROR
+      // =============================================
+
+      if (
+        parsed.type === "error"
+      ) {
+
+        console.error(
+          parsed.data
+        );
+
+        setStreaming(false);
+
+        return;
+      }
+
+      // =============================================
+      // CHAT ID
+      // =============================================
+
+      if (
+        parsed.type === "chat_id"
+      ) {
+
+        setChatId(
+          parsed.data
+        );
+
+        return;
+      }
+
+      // =============================================
+      // SOURCES
+      // =============================================
+
+      if (
+        parsed.type === "sources"
+      ) {
+
+        setSources(
+          parsed.data
+        );
+
+        return;
+      }
+
+      // =============================================
+      // END STREAM
+      // =============================================
+
+      if (
+        parsed.type === "end"
+      ) {
+
+        setStreaming(false);
+
+        return;
+      }
+
+      // =============================================
+      // TOKEN
+      // =============================================
+
+      if (
+        parsed.type === "token"
+      ) {
+
+        addStreamingToken(
+          parsed.data
+        );
+      }
+
+    } catch (error) {
+
+      console.error(error);
+    }
+  };
+
+  // ===================================================
+  // WEBSOCKET SETUP
+  // ===================================================
+
+  const setupWebSocket = () => {
+
+    const ws =
+      createWebSocket();
+
+    websocketRef.current = ws;
+
+    // ===============================================
+    // EVENTS
+    // ===============================================
+
+    ws.onmessage =
+      handleMessage;
+
+    ws.onclose = () => {
+
+      console.log(
+        "WebSocket disconnected"
+      );
+
+      setStreaming(false);
+    };
+
+    ws.onerror = (error) => {
+
+      console.error(error);
+
+      setStreaming(false);
+    };
+  };
+
+  // ===================================================
+  // INITIAL CONNECTION
+  // ===================================================
+
+  useEffect(() => {
+
+    setupWebSocket();
+
+    return () => {
+
+      websocketRef.current?.close();
+    };
+
+  }, []);
+
+  // ===================================================
   // SEND MESSAGE
   // ===================================================
 
   const handleSend = async () => {
 
-    if (
-      !query.trim() ||
-      !websocketRef.current
-    ) {
+    // ===============================================
+    // VALIDATION
+    // ===============================================
+
+    if (!query.trim()) {
       return;
     }
 
-    // ================================================
+    // ===============================================
+    // RECONNECT IF CLOSED
+    // ===============================================
+
+    if (
+      !websocketRef.current ||
+      websocketRef.current.readyState !==
+        WebSocket.OPEN
+    ) {
+
+      setupWebSocket();
+
+      // wait briefly
+      await new Promise(
+        (resolve) =>
+          setTimeout(
+            resolve,
+            500
+          )
+      );
+    }
+
+    // ===============================================
+    // RESET SOURCES
+    // ===============================================
+
+    setSources([]);
+
+    // ===============================================
     // USER MESSAGE
-    // ================================================
+    // ===============================================
 
     addMessage({
       role: "user",
       content: query,
     });
 
+    // ===============================================
+    // STREAMING
+    // ===============================================
+
     setStreaming(true);
 
-    websocketRef.current.send(
+    websocketRef.current?.send(
       query
     );
 
@@ -228,11 +319,12 @@ export default function ChatPage() {
   };
 
   return (
+
     <div className="max-w-5xl mx-auto p-6">
 
-      {/* =========================================== */}
+      {/* ========================================= */}
       {/* HEADER */}
-      {/* =========================================== */}
+      {/* ========================================= */}
 
       <div className="flex justify-between items-center mb-6">
 
@@ -248,11 +340,15 @@ export default function ChatPage() {
         </button>
       </div>
 
-      {/* =========================================== */}
+      {/* ========================================= */}
       {/* CHAT WINDOW */}
-      {/* =========================================== */}
+      {/* ========================================= */}
 
       <div className="border rounded-xl p-4 h-[600px] overflow-y-auto mb-4">
+
+        {/* ===================================== */}
+        {/* MESSAGES */}
+        {/* ===================================== */}
 
         {messages.map(
           (message, idx) => (
@@ -281,9 +377,50 @@ export default function ChatPage() {
           )
         )}
 
-        {/* ======================================= */}
+        {/* ===================================== */}
+        {/* SOURCES */}
+        {/* ===================================== */}
+
+        {sources.length > 0 && (
+
+          <div className="border rounded-xl p-4 mb-4 bg-gray-50">
+
+            <h2 className="text-xl font-bold mb-4">
+              Sources
+            </h2>
+
+            {sources.map(
+              (
+                source,
+                idx
+              ) => (
+
+                <div
+                  key={idx}
+                  className="mb-4 border-b pb-2"
+                >
+
+                  <div className="font-semibold">
+                    {source.citation || `Source ${idx + 1}`}
+                  </div>
+
+                  <div className="text-sm text-gray-500">
+                    Document ID:{" "}
+                    {source.document_id}
+                  </div>
+
+                  <div className="mt-2 text-sm whitespace-pre-wrap">
+                    {source.content}
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        )}
+
+        {/* ===================================== */}
         {/* STREAMING */}
-        {/* ======================================= */}
+        {/* ===================================== */}
 
         {streaming && (
 
@@ -291,50 +428,17 @@ export default function ChatPage() {
             AI is typing...
           </div>
         )}
+
+        {/* ===================================== */}
+        {/* AUTO SCROLL TARGET */}
+        {/* ===================================== */}
+
+        <div ref={bottomRef} />
       </div>
 
-      {/* =========================================== */}
-      {/* SOURCES */}
-      {/* =========================================== */}
-
-      {sources.length > 0 && (
-
-        <div className="border rounded-xl p-4 mb-4">
-
-          <h2 className="text-xl font-bold mb-4">
-            Sources
-          </h2>
-
-          {sources.map(
-            (source, idx) => (
-
-              <div
-                key={idx}
-                className="mb-4 border-b pb-2"
-              >
-
-                <div className="font-semibold">
-                  {source.citation}
-                </div>
-
-                <div className="text-sm text-gray-500">
-                  Document ID:{" "}
-                  {source.document_id}
-                </div>
-
-                <div className="mt-2 text-sm">
-                  {source.content}
-                </div>
-
-              </div>
-            )
-          )}
-        </div>
-      )}
-
-      {/* =========================================== */}
+      {/* ========================================= */}
       {/* INPUT */}
-      {/* =========================================== */}
+      {/* ========================================= */}
 
       <div className="flex gap-2">
 
@@ -360,7 +464,7 @@ export default function ChatPage() {
         />
 
         <button
-          className="bg-black text-white px-6 rounded-xl"
+          className="bg-black text-white px-6 rounded-xl disabled:opacity-50"
           onClick={handleSend}
           disabled={streaming}
         >
