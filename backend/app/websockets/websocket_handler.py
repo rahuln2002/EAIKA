@@ -104,6 +104,11 @@ class WebSocketHandler:
                     user_id=user_id,
                 )
 
+            await manager.send_chat_id(
+                websocket,
+                chat.id,
+            )
+
             # =================================================
             # MAIN LOOP
             # =================================================
@@ -176,7 +181,7 @@ class WebSocketHandler:
                 for token in stream:
                     full_response += token
 
-                    await manager.send_message(
+                    await manager.send_token(
                         websocket,
                         token,
                     )
@@ -210,20 +215,17 @@ class WebSocketHandler:
                 # SEND SOURCES
                 # =============================================
 
-                await websocket.send_json(
-                    {
-                        "type": "sources",
-                        "data": retrieved_chunks,
-                    }
+                await manager.send_sources(
+                    websocket,
+                    retrieved_chunks,
                 )
 
                 # =============================================
                 # END STREAM
                 # =============================================
 
-                await manager.send_message(
+                await manager.send_end(
                     websocket,
-                    "[END]",
                 )
 
         except JWTError:

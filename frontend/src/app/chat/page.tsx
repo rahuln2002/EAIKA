@@ -151,38 +151,38 @@ export default function ChatPage() {
     token: string
   ) => {
 
-    const currentMessages = [
-      ...messages,
-    ];
+    useChatStore.setState(
+      (state) => {
 
-    const lastMessage =
-      currentMessages[
-        currentMessages.length - 1
-      ];
+        const updated = [
+          ...state.messages,
+        ];
 
-    // ================================================
-    // APPEND TO EXISTING AI MESSAGE
-    // ================================================
+        const last =
+          updated[
+            updated.length - 1
+          ];
 
-    if (
-      lastMessage &&
-      lastMessage.role ===
-        "assistant"
-    ) {
+        if (
+          last &&
+          last.role === "assistant"
+        ) {
 
-      lastMessage.content += token;
+          last.content += token;
 
-      useChatStore.setState({
-        messages: currentMessages,
-      });
+        } else {
 
-    } else {
+          updated.push({
+            role: "assistant",
+            content: token,
+          });
+        }
 
-      addMessage({
-        role: "assistant",
-        content: token,
-      });
-    }
+        return {
+          messages: updated,
+        };
+      }
+    );
   };
 
   // ===================================================
