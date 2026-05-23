@@ -55,28 +55,28 @@ export default function ChatPage() {
   useEffect(() => {
 
     const ws =
-      createWebSocket(chatId);
+      createWebSocket();
 
     websocketRef.current = ws;
 
-    // ================================================
-    // RECEIVE MESSAGE
-    // ================================================
-
-    ws.onmessage = (event) => {
+    ws.onmessage = (
+      event
+    ) => {
 
       try {
 
-        const parsed = JSON.parse(
-          event.data
-        );
+        const parsed =
+          JSON.parse(
+            event.data
+          );
 
-        // ============================================
+        // ========================
         // CHAT ID
-        // ============================================
+        // ========================
 
         if (
-          parsed.type === "chat_id"
+          parsed.type ===
+          "chat_id"
         ) {
 
           setChatId(
@@ -86,12 +86,13 @@ export default function ChatPage() {
           return;
         }
 
-        // ============================================
+        // ========================
         // SOURCES
-        // ============================================
+        // ========================
 
         if (
-          parsed.type === "sources"
+          parsed.type ===
+          "sources"
         ) {
 
           setSources(
@@ -101,38 +102,41 @@ export default function ChatPage() {
           return;
         }
 
-        // ============================================
-        // END STREAM
-        // ============================================
+        // ========================
+        // END
+        // ========================
 
         if (
-          parsed.type === "end"
+          parsed.type ===
+          "end"
         ) {
 
-          setStreaming(false);
+          setStreaming(
+            false
+          );
 
           return;
         }
 
-        // ============================================
-        // TOKEN STREAM
-        // ============================================
+        // ========================
+        // TOKEN
+        // ========================
 
         if (
-          parsed.type === "token"
+          parsed.type ===
+          "token"
         ) {
 
-          const token =
-            parsed.data;
-
           addStreamingToken(
-            token
+            parsed.data
           );
         }
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          error
+        );
       }
     };
 
@@ -141,7 +145,7 @@ export default function ChatPage() {
       ws.close();
     };
 
-  }, [chatId]);
+  }, []);
 
   // ===================================================
   // STREAM TOKEN APPENDER
