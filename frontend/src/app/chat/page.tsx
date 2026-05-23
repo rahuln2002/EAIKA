@@ -31,8 +31,6 @@ export default function ChatPage() {
   // ===================================================
 
   const {
-
-    chatId,
     setChatId,
 
     messages,
