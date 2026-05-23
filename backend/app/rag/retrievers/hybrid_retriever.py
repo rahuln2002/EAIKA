@@ -53,7 +53,7 @@ class HybridRetriever:
         # EXTRACT PAYLOAD TEXTS
         # =============================================
 
-        dense_texts = []
+        dense_chunks = []
 
         for result in dense_results:
             payload = getattr(
@@ -62,21 +62,39 @@ class HybridRetriever:
                 {},
             )
 
-            text = payload.get("text")
+            content = payload.get("content")
 
-            if text:
-                dense_texts.append(text)
+            if content:
+                dense_chunks.append(
+                    {
+                        "chunk_id": payload.get("chunk_id"),
+                        "document_id": payload.get("document_id"),
+                        "content": content,
+                    }
+                )
 
         # =============================================
         # FUSION
         # =============================================
 
-        combined = bm25_results + dense_texts
+        bm25_chunks = [{"content": text} for text in bm25_results]
+
+        combined = bm25_chunks + dense_chunks
 
         # =============================================
         # DEDUPLICATION
         # =============================================
 
-        unique_results = list(dict.fromkeys(combined))
+        seen = set()
+
+        unique_results = []
+
+        for chunk in combined:
+            content = chunk["content"]
+
+            if content not in seen:
+                seen.add(content)
+
+                unique_results.append(chunk)
 
         return unique_results[:top_k]
