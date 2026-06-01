@@ -1,6 +1,4 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 import { createWebSocket } from "../lib/websocket";
 
@@ -79,76 +77,63 @@ export default function ChatPage() {
     // MESSAGE HANDLER
     // ===================================================
 
-    const handleMessage = (event: MessageEvent) => {
-        try {
-            const parsed = JSON.parse(event.data);
+    const handleMessage = useCallback(
+        (event: MessageEvent) => {
+            try {
+                const parsed = JSON.parse(event.data);
 
-            // =============================================
-            // ERROR
-            // =============================================
+                if (parsed.type === "error") {
+                    console.error(parsed.data);
 
-            if (parsed.type === "error") {
-                console.error(parsed.data);
+                    setStreaming(false);
 
-                setStreaming(false);
+                    return;
+                }
 
-                return;
+                if (parsed.type === "chat_id") {
+                    setChatId(parsed.data);
+
+                    return;
+                }
+
+                if (parsed.type === "sources") {
+                    setSources(parsed.data);
+
+                    return;
+                }
+
+                if (parsed.type === "end") {
+                    setStreaming(false);
+
+                    return;
+                }
+
+                if (parsed.type === "token") {
+                    addStreamingToken(parsed.data);
+                }
+            } catch (error) {
+                console.error(error);
             }
-
-            // =============================================
-            // CHAT ID
-            // =============================================
-
-            if (parsed.type === "chat_id") {
-                setChatId(parsed.data);
-
-                return;
-            }
-
-            // =============================================
-            // SOURCES
-            // =============================================
-
-            if (parsed.type === "sources") {
-                setSources(parsed.data);
-
-                return;
-            }
-
-            // =============================================
-            // END STREAM
-            // =============================================
-
-            if (parsed.type === "end") {
-                setStreaming(false);
-
-                return;
-            }
-
-            // =============================================
-            // TOKEN
-            // =============================================
-
-            if (parsed.type === "token") {
-                addStreamingToken(parsed.data);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
+        },
+        [setChatId, setSources, setStreaming],
+    );
 
     // ===================================================
     // WEBSOCKET SETUP
     // ===================================================
 
-    const setupWebSocket = () => {
+    const setupWebSocket = useCallback(() => {
+        // prevent duplicate connections
+        if (
+            websocketRef.current &&
+            websocketRef.current.readyState === WebSocket.OPEN
+        ) {
+            return;
+        }
+
         const ws = createWebSocket();
 
         websocketRef.current = ws;
-
-        // ===============================================
-        // EVENTS
-        // ===============================================
 
         ws.onmessage = handleMessage;
 
@@ -163,7 +148,7 @@ export default function ChatPage() {
 
             setStreaming(false);
         };
-    };
+    }, [handleMessage, setStreaming]);
 
     // ===================================================
     // INITIAL CONNECTION
@@ -175,7 +160,7 @@ export default function ChatPage() {
         return () => {
             websocketRef.current?.close();
         };
-    }, []);
+    }, [setupWebSocket]);
 
     // ===================================================
     // SEND MESSAGE
@@ -225,7 +210,9 @@ export default function ChatPage() {
 
         setStreaming(true);
 
-        websocketRef.current?.send(query);
+        if (websocketRef.current?.readyState === WebSocket.OPEN) {
+            websocketRef.current.send(query);
+        }
 
         setQuery("");
     };
