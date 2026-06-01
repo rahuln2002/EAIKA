@@ -7,6 +7,6 @@ export const createWebSocket =
     );
 
   return new WebSocket(
-    `${process.env.NEXT_PUBLIC_WS_URL}/ws/chat?token=${token}`
+    `${import.meta.env.VITE_WS_URL}/ws/chat?token=${token}`
   );
 };

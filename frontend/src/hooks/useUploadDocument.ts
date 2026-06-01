@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { uploadDocument } from "@/services/uploadService";
+import { uploadDocument } from "../services/uploadService";
 
 export const useUploadDocument =
   () => {
