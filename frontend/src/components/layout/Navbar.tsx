@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MdOutlineDarkMode } from "react-icons/md";
 
 import { type NavbarProps } from "../../types/navbar";
@@ -21,9 +21,13 @@ export const Navbar = ({
 
     const navigate = useNavigate();
 
-    useLocation();
+    const [authenticated, setAuthenticated] = useState(isAuthenticated());
 
-    const authenticated = isAuthenticated();
+    const location = useLocation();
+
+    useEffect(() => {
+        setAuthenticated(isAuthenticated());
+    }, [location.pathname]);
 
     const handleLogout = () => {
         logout();
