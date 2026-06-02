@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MdOutlineDarkMode } from "react-icons/md";
 
 import { type NavbarProps } from "../../types/navbar";
@@ -18,19 +18,15 @@ export const Navbar = ({
     toggleTheme,
 }: NavbarProps) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [authenticated, setAuthenticated] = useState(false);
 
     const navigate = useNavigate();
-    const location = useLocation();
 
-    // Re-check auth whenever route changes
-    useEffect(() => {
-        setAuthenticated(isAuthenticated());
-    }, [location]);
+    useLocation();
+
+    const authenticated = isAuthenticated();
 
     const handleLogout = () => {
         logout();
-        setAuthenticated(false);
         navigate("/login");
     };
 
