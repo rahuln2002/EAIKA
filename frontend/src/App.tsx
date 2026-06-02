@@ -11,6 +11,8 @@ import { mainTitle, links } from "./constants/navbar";
 
 import { Routes, Route } from "react-router-dom";
 
+import ProtectedRoute from "./components/common/ProtectedRoute";
+
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import DashboardPage from "./pages/dashboard";
@@ -69,8 +71,22 @@ function App() {
                         path="/dashboard"
                         element={<DashboardPage theme={useTheme} />}
                     />
-                    <Route path="/chat" element={<ChatPage />} />
-                    <Route path="/upload" element={<UploadPage />} />
+                    <Route
+                        path="/chat"
+                        element={
+                            <ProtectedRoute>
+                                <ChatPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/upload"
+                        element={
+                            <ProtectedRoute>
+                                <UploadPage />
+                            </ProtectedRoute>
+                        }
+                    />
                     <Route path="/summarize" element={<SummarizePage />} />
                 </Routes>
             </main>

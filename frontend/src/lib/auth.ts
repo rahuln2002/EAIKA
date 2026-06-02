@@ -1,5 +1,7 @@
 export const saveToken = (token: string) => {
     localStorage.setItem("access_token", token);
+
+    window.dispatchEvent(new Event("authChanged"));
 };
 
 export const getToken = () => {
@@ -8,6 +10,8 @@ export const getToken = () => {
 
 export const logout = () => {
     localStorage.removeItem("access_token");
+
+    window.dispatchEvent(new Event("authChanged"));
 };
 
 export const isAuthenticated = () => {

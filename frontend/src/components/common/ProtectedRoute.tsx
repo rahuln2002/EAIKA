@@ -1,24 +1,20 @@
-"use client";
+import { Navigate } from "react-router-dom";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { getToken } from "../../lib/auth";
 
-import { getToken } from "@/lib/auth";
+import toast from "react-hot-toast";
 
 export default function ProtectedRoute({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  const router = useRouter();
-
-  useEffect(() => {
     const token = getToken();
 
     if (!token) {
-      router.push("/login");
+        toast.error("Login First.");
+        return <Navigate to="/login" replace />;
     }
-  }, [router]);
 
-  return <>{children}</>;
+    return <>{children}</>;
 }
