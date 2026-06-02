@@ -25,7 +25,7 @@ export default function ChatPage() {
         messages,
         addMessage,
 
-        sources,
+        // sources,
         setSources,
 
         streaming,
@@ -218,7 +218,7 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto p-6">
+        <div className="max-w-5xl mx-auto">
             {/* ========================================= */}
             {/* HEADER */}
             {/* ========================================= */}
@@ -238,7 +238,7 @@ export default function ChatPage() {
             {/* CHAT WINDOW */}
             {/* ========================================= */}
 
-            <div className="border rounded-xl p-4 h-150 overflow-y-auto mb-4">
+            <div className="border rounded-xl p-4 h-75 overflow-y-auto mb-4">
                 {/* ===================================== */}
                 {/* MESSAGES */}
                 {/* ===================================== */}
@@ -266,7 +266,7 @@ export default function ChatPage() {
                 {/* SOURCES */}
                 {/* ===================================== */}
 
-                {sources.length > 0 && (
+                {/* {sources.length > 0 && (
                     <div className="border rounded-xl p-4 mb-4 bg-gray-50">
                         <h2 className="text-xl font-bold mb-4">Sources</h2>
 
@@ -286,7 +286,7 @@ export default function ChatPage() {
                             </div>
                         ))}
                     </div>
-                )}
+                )} */}
 
                 {/* ===================================== */}
                 {/* STREAMING */}

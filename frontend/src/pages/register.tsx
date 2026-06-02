@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 
 import toast from "react-hot-toast";
@@ -28,13 +26,15 @@ export default function RegisterPage() {
             setUsername("");
             setEmail("");
             setPassword("");
-        } catch {
+        } catch (error) {
+            console.error(error);
+
             toast.error("Registration failed.");
         }
     };
 
     return (
-        <div className="max-w-md mx-auto p-10">
+        <div className="max-w-md mx-auto">
             <h1 className="text-3xl font-bold mb-6">Register</h1>
 
             <input
@@ -60,7 +60,7 @@ export default function RegisterPage() {
             />
 
             <button
-                className="bg-black text-white p-3 rounded w-full"
+                className="p-3 rounded w-full"
                 onClick={handleRegister}
                 disabled={registerMutation.isPending}
             >

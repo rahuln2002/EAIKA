@@ -1,16 +1,59 @@
 @import "tailwindcss";
 
-/* Hide scrollbar for Chrome, Edge and Safari */
+/* Page Background */
+
+html,
+body,
+#root {
+    background: black;
+}
+
+/* Light Theme */
+:root {
+    --scroll-thumb: rgba(0, 0, 0, 0.45);
+    --scroll-thumb-hover: rgba(0, 0, 0, 0.7);
+    --scroll-track: rgba(0, 0, 0, 0.08);
+    --page-bg: white;
+}
+
+/* Dark Theme */
+html.dark {
+    --scroll-thumb: rgba(255, 255, 255, 0.4);
+    --scroll-thumb-hover: rgba(255, 255, 255, 0.7);
+    --scroll-track: rgba(255, 255, 255, 0.08);
+    --page-bg: black;
+}
+
+/* Apply theme bg globally */
+html,
+body,
+#root {
+    background: var(--page-bg);
+    transition: background 0.3s ease;
+}
+
+/* Scrollbar */
+
 ::-webkit-scrollbar {
-    display: none;
+    width: 10px;
 }
 
-/* Hide scrollbar for Firefox */
+::-webkit-scrollbar-track {
+    background: var(--scroll-track);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb);
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scroll-thumb-hover);
+}
+
+/* Firefox */
 html {
-    scrollbar-width: none;
-}
-
-/* Hide scrollbar for IE and old Edge */
-body {
-    -ms-overflow-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+    scroll-behavior: smooth;
 }

@@ -22,13 +22,15 @@ export default function LoginPage() {
             saveToken(response.access_token);
 
             toast.success("Login successful!");
-        } catch {
+        } catch (error) {
+            console.error(error);
+
             toast.error("Login failed.");
         }
     };
 
     return (
-        <div className="max-w-md mx-auto p-10">
+        <div className="max-w-md mx-auto">
             <h1 className="text-3xl font-bold mb-6">Login</h1>
 
             <input
@@ -47,7 +49,7 @@ export default function LoginPage() {
             />
 
             <button
-                className="bg-black text-white p-3 rounded w-full"
+                className="p-3 rounded w-full"
                 onClick={handleLogin}
                 disabled={loginMutation.isPending}
             >

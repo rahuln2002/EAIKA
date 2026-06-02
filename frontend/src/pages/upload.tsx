@@ -24,13 +24,15 @@ export default function UploadPage() {
             toast.success("Upload successful!");
 
             setFile(null);
-        } catch {
+        } catch (error) {
+            console.error(error);
+
             toast.error("Upload failed.");
         }
     };
 
     return (
-        <div className="max-w-xl mx-auto p-10">
+        <div className="max-w-xl mx-auto">
             <h1 className="text-3xl font-bold mb-6">Upload Document</h1>
 
             <div className="border rounded-lg p-6">
