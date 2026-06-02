@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 
 import { useRegister } from "../hooks/useRegister";
 
+import { useNavigate } from "react-router-dom";
+
 export default function RegisterPage() {
     const [username, setUsername] = useState("");
 
@@ -12,6 +14,8 @@ export default function RegisterPage() {
     const [password, setPassword] = useState("");
 
     const registerMutation = useRegister();
+
+    const navigate = useNavigate();
 
     const handleRegister = async () => {
         try {
@@ -26,6 +30,8 @@ export default function RegisterPage() {
             setUsername("");
             setEmail("");
             setPassword("");
+
+            navigate("/login");
         } catch (error) {
             console.error(error);
 

@@ -4,7 +4,4 @@ export const links = [
     { href: "/chat", label: "Chat"},
     { href: "/upload", label: "Upload"},
     { href: "/summarize", label: "Summarize"},
-    { href: "/login", label: "Login"},
-    { href: "/register", label: "Register"},
-    { href: "/logout", label: "Logout"},
 ];

@@ -6,10 +6,14 @@ import toast from "react-hot-toast";
 
 import { useUploadDocument } from "../hooks/useUploadDocument";
 
+import { useNavigate } from "react-router-dom";
+
 export default function UploadPage() {
     const [file, setFile] = useState<File | null>(null);
 
     const uploadMutation = useUploadDocument();
+
+    const navigate = useNavigate();
 
     const handleUpload = async () => {
         if (!file) {
@@ -24,6 +28,8 @@ export default function UploadPage() {
             toast.success("Upload successful!");
 
             setFile(null);
+
+            navigate("/chat");
         } catch (error) {
             console.error(error);
 

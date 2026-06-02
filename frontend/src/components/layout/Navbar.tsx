@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdOutlineDarkMode } from "react-icons/md";
 
 import { type NavbarProps } from "../../types/navbar";
 import { Container } from "./Container";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import { isAuthenticated, logout } from "../../lib/auth";
 
@@ -18,12 +18,19 @@ export const Navbar = ({
     toggleTheme,
 }: NavbarProps) => {
     const [isOpen, setIsOpen] = useState(false);
-    const navigate = useNavigate();
+    const [authenticated, setAuthenticated] = useState(false);
 
-    const authenticated = isAuthenticated();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Re-check auth whenever route changes
+    useEffect(() => {
+        setAuthenticated(isAuthenticated());
+    }, [location]);
 
     const handleLogout = () => {
         logout();
+        setAuthenticated(false);
         navigate("/login");
     };
 
@@ -99,6 +106,10 @@ export const Navbar = ({
                                 </>
                             ) : (
                                 <>
+                                    <li className="list-none">
+                                        <Link to="/summarize">Summarize</Link>
+                                    </li>
+
                                     <li className="list-none">
                                         <Link to="/login">Login</Link>
                                     </li>
@@ -200,13 +211,7 @@ export const Navbar = ({
                                                         onClick={() =>
                                                             setIsOpen(false)
                                                         }
-                                                        aria-label={link.label}
-                                                        className="
-                                                            flex items-center gap-3
-                                                            text-2xl
-                                                            transition-all duration-300
-                                                            hover:drop-shadow-[0_0_10px_rgba(147,197,253,0.8)]
-                                                        "
+                                                        className="text-2xl"
                                                     >
                                                         {link.label}
                                                     </Link>
@@ -232,6 +237,18 @@ export const Navbar = ({
                                         </>
                                     ) : (
                                         <>
+                                            <li className="list-none">
+                                                <Link
+                                                    to="/summarize"
+                                                    onClick={() =>
+                                                        setIsOpen(false)
+                                                    }
+                                                    className="text-2xl"
+                                                >
+                                                    Summarize
+                                                </Link>
+                                            </li>
+
                                             <li className="list-none">
                                                 <Link
                                                     to="/login"

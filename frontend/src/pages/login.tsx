@@ -5,12 +5,16 @@ import toast from "react-hot-toast";
 import { saveToken } from "../lib/auth";
 import { useLogin } from "../hooks/useLogin";
 
+import { useNavigate } from "react-router-dom";
+
 export default function LoginPage() {
     const [email, setEmail] = useState("");
 
     const [password, setPassword] = useState("");
 
     const loginMutation = useLogin();
+
+    const navigate = useNavigate();
 
     const handleLogin = async () => {
         try {
@@ -22,6 +26,8 @@ export default function LoginPage() {
             saveToken(response.access_token);
 
             toast.success("Login successful!");
+
+            navigate("/dashboard");
         } catch (error) {
             console.error(error);
 
