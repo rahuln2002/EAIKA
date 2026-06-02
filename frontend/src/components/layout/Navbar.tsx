@@ -21,7 +21,6 @@ export const Navbar = ({
 
     const navigate = useNavigate();
 
-    // Subscribes component to route changes
     useLocation();
 
     const authenticated = isAuthenticated();
