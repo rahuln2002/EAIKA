@@ -1,4 +1,5 @@
 ![CI](https://github.com/rahuln2002/EAIKA/actions/workflows/ci.yml/badge.svg)
+
 # Enterprise AI Knowledge Assistant (EAIKA)
 
 Production-grade Enterprise RAG Platform with Hybrid Retrieval, Cross-Encoder Reranking, Streaming AI Chat, Summarization, Observability, and Multi-Tenant Architecture.
@@ -9,73 +10,78 @@ Production-grade Enterprise RAG Platform with Hybrid Retrieval, Cross-Encoder Re
 
 ## 🤖 Enterprise RAG Pipeline
 
-* Hybrid Retrieval (BM25 + Dense Retrieval)
-* Cross-Encoder Reranking
-* Context-Aware Generation
-* Source Attribution & Citations
-* Retrieval Evaluation Framework
+- Hybrid Retrieval (BM25 + Dense Retrieval)
+- Cross-Encoder Reranking
+- Context-Aware Generation
+- Source Attribution & Citations
+- Retrieval Evaluation Framework
 
 ## 💬 Real-Time AI Chat
 
-* WebSocket Streaming
-* Token-by-Token Response Streaming
-* ChatGPT-like User Experience
-* Multi-Session Conversations
+- WebSocket Streaming
+- Token-by-Token Response Streaming
+- Better User Experience
+- Multi-Session Conversations
 
 ## 📄 Document Intelligence
 
-* PDF Upload & Parsing
-* DOCX Support
-* Semantic Chunking
-* Metadata Extraction
-* Recursive Chunking Pipeline
+- PDF Upload & Parsing
+- DOCX Support
+- Semantic Chunking
+- Metadata Extraction
+- Recursive Chunking Pipeline
 
 ## 🧠 Summarization System
 
-* Map-Reduce Summarization
-* Executive Summaries
-* Long Document Processing
-* Hierarchical Summarization
+- Map-Reduce Summarization
+- Executive Summaries
+- Long Document Processing
+- Hierarchical Summarization
 
 ## 🔍 Enterprise Retrieval
 
-* Hybrid Search Architecture
-* BM25 Lexical Retrieval
-* Dense Vector Retrieval
-* Cross-Encoder Reranking
-* Qdrant Vector Database
+- Hybrid Search Architecture
+- BM25 Lexical Retrieval
+- Dense Vector Retrieval
+- Cross-Encoder Reranking
+- Qdrant Vector Database
 
 ## 📊 AI Evaluation & Analytics
 
-* Faithfulness Evaluation
-* Hallucination Detection
-* Retrieval Relevancy Scoring
-* Retrieval Metrics
-* RAG Evaluation Framework
+- Faithfulness Evaluation
+- Hallucination Detection
+- Retrieval Relevancy Scoring
+- Retrieval Metrics
+- RAG Evaluation Framework
 
 ## 🔐 Security & Multi-Tenancy
 
-* JWT Authentication
-* User-Isolated Retrieval
-* Tenant-Aware Search
-* Protected APIs
-* Secure WebSocket Authentication
+- JWT Authentication
+- User-Isolated Retrieval
+- Tenant-Aware Search
+- Protected APIs
+- Secure WebSocket Authentication
 
 ## ⚡ Scalability & Infrastructure
 
-* Dockerized Architecture
-* Kubernetes Deployment
-* Celery Background Workers
-* Redis Caching
-* PostgreSQL Storage
+- Dockerized Architecture
+- Kubernetes Deployment
+- Celery Background Workers
+- Redis Caching
+- PostgreSQL Storage
 
 ## 📈 Observability & Monitoring
 
-* OpenTelemetry Tracing
-* Prometheus Metrics
-* Structured Logging
-* Request Latency Tracking
-* Distributed Tracing
+- OpenTelemetry Tracing
+- Prometheus Metrics
+- Structured Logging
+- Request Latency Tracking
+- Distributed Tracing
+
+## Modes
+
+- Dark
+- Light
 
 ---
 
@@ -108,39 +114,39 @@ OpenTelemetry
 
 ## Backend
 
-* FastAPI
-* SQLAlchemy
-* Alembic
-* Celery
-* Redis
-* PostgreSQL
-* Qdrant
-* OpenTelemetry
-* Prometheus
+- FastAPI
+- SQLAlchemy
+- Alembic
+- Celery
+- Redis
+- PostgreSQL
+- Qdrant
+- OpenTelemetry
+- Prometheus
 
 ## AI / NLP
 
-* Groq
-* Sentence Transformers
-* Cross-Encoder Reranking
-* BM25 Retrieval
+- Groq
+- Sentence Transformers
+- Cross-Encoder Reranking
+- BM25 Retrieval
 
 ## Frontend
 
-* Next.js 15
-* React 19
-* TypeScript
-* TailwindCSS
-* Zustand
-* React Query
-* WebSockets
+- Vite 8
+- React 19
+- TypeScript
+- TailwindCSS
+- Zustand
+- React Query
+- WebSockets
 
 ## Infrastructure
 
-* Docker
-* Docker Compose
-* Kubernetes
-* Nginx
+- Docker
+- Docker Compose
+- Kubernetes
+- Nginx
 
 ---
 
@@ -178,14 +184,14 @@ DATABASE_URL=postgresql://postgres:postgres@postgres:5432/enterprise_ai_ka
 # REDIS
 # =====================================================
 
-REDIS_URL=redis://redis:6379/0
+REDIS_URL=redis://redis:6379
 
 # =====================================================
 # QDRANT
 # =====================================================
 
-QDRANT_HOST=qdrant
-QDRANT_PORT=6333
+QDRANT_URL=http://qdrant:6333
+QDRANT_API_KEY=
 
 # =====================================================
 # GROQ
@@ -284,7 +290,7 @@ POST /api/v1/auth/login
 
 ```http
 POST /api/v1/chat
-WS   /ws/chat
+WS   /api/v1/ws/chat
 ```
 
 ## Upload
@@ -338,16 +344,16 @@ Evaluation Layer
 
 The retrieval system combines:
 
-* BM25 Lexical Retrieval
-* Dense Semantic Retrieval
-* Cross-Encoder Reranking
+- BM25 Lexical Retrieval
+- Dense Semantic Retrieval
+- Cross-Encoder Reranking
 
 This improves:
 
-* semantic understanding
-* exact keyword matching
-* acronym retrieval
-* retrieval precision
+- semantic understanding
+- exact keyword matching
+- acronym retrieval
+- retrieval precision
 
 ---
 
@@ -357,17 +363,17 @@ The platform includes enterprise-grade RAG evaluation:
 
 ## Metrics
 
-* Faithfulness Score
-* Hallucination Score
-* Retrieval Relevancy
-* Retrieval Metrics
+- Faithfulness Score
+- Hallucination Score
+- Retrieval Relevancy
+- Retrieval Metrics
 
 ## Purpose
 
-* Measure grounding quality
-* Detect hallucinations
-* Evaluate retrieval quality
-* Improve observability
+- Measure grounding quality
+- Detect hallucinations
+- Evaluate retrieval quality
+- Improve observability
 
 ---
 
@@ -387,9 +393,9 @@ Executive Summary
 
 Supports:
 
-* long-document summarization
-* hierarchical summarization
-* enterprise summarization workflows
+- long-document summarization
+- hierarchical summarization
+- enterprise summarization workflows
 
 ---
 
@@ -397,10 +403,10 @@ Supports:
 
 The platform supports:
 
-* user-isolated retrieval
-* ownership-aware search
-* secure document access
-* protected vector retrieval
+- user-isolated retrieval
+- ownership-aware search
+- secure document access
+- protected vector retrieval
 
 Each user retrieves ONLY their own uploaded documents.
 
@@ -410,10 +416,10 @@ Each user retrieves ONLY their own uploaded documents.
 
 Integrated enterprise observability stack:
 
-* OpenTelemetry Tracing
-* Prometheus Metrics
-* Structured Logging
-* Request Latency Tracking
+- OpenTelemetry Tracing
+- Prometheus Metrics
+- Structured Logging
+- Request Latency Tracking
 
 ---
 
@@ -429,39 +435,44 @@ Integrated enterprise observability stack:
 
 ---
 
-# 📸 Screenshots (Soon...)
+# 📸 Screenshots
 
 ```text
 docs/screenshots/
 ```
 
+Dashboard
+![Dashboard](https://github.com/rahuln2002/EAIKA/blob/main/docs/screenshots/LoginSuccessful.png)
+
+Chat
+![Chat](https://github.com/rahuln2002/EAIKA/blob/main/docs/screenshots/Chat.png)
+
 ---
 
 # 🧪 Future Improvements
 
-* Reciprocal Rank Fusion (RRF)
-* LangGraph Agent Workflows
-* Multi-Agent Systems
-* Tool Calling
-* GPU Inference
-* Llama.cpp Integration
-* Local LLM Support
-* Role-Based Access Control (RBAC)
-* PDF Page-Level Citations
-* Grafana Dashboards
-* CI/CD Pipelines
-* Helm Charts
-* AWS/GCP Deployment
+- Reciprocal Rank Fusion (RRF)
+- LangGraph Agent Workflows
+- Multi-Agent Systems
+- Tool Calling
+- GPU Inference
+- Llama.cpp Integration
+- Local LLM Support
+- Role-Based Access Control (RBAC)
+- PDF Page-Level Citations
+- Grafana Dashboards
+- Helm Charts
+- AWS/GCP Deployment
 
 ---
 
-# 🎯 Resume-Level Highlights
+# 🎯 Highlights
 
-* Built a production-grade enterprise RAG platform with hybrid retrieval, reranking, and streaming AI chat.
-* Implemented multi-tenant user-isolated retrieval with secure WebSocket authentication.
-* Designed scalable AI infrastructure using FastAPI, Next.js, Qdrant, PostgreSQL, Redis, Docker, and Kubernetes.
-* Developed enterprise observability using OpenTelemetry, Prometheus, and structured logging.
-* Created map-reduce summarization pipelines for long-document intelligence systems.
+- Built a production-grade enterprise RAG platform with hybrid retrieval, reranking, and streaming AI chat.
+- Implemented multi-tenant user-isolated retrieval with secure WebSocket authentication.
+- Designed scalable AI infrastructure using FastAPI, Next.js, Qdrant, PostgreSQL, Redis, Docker, and Kubernetes.
+- Developed enterprise observability using OpenTelemetry, Prometheus, and structured logging.
+- Created map-reduce summarization pipelines for long-document intelligence systems.
 
 ---
 
@@ -469,15 +480,15 @@ docs/screenshots/
 
 This project demonstrates:
 
-* LLM Engineering
-* RAG Systems
-* GenAI Infrastructure
-* AI System Design
-* Full-Stack AI Development
-* MLOps / LLMOps
-* Distributed Systems
-* Enterprise Backend Engineering
-* Cloud-Native Deployment
+- LLM Engineering
+- RAG Systems
+- GenAI Infrastructure
+- AI System Design
+- Full-Stack AI Development
+- MLOps / LLMOps
+- Distributed Systems
+- Enterprise Backend Engineering
+- Cloud-Native Deployment
 
 ---
 
@@ -486,7 +497,7 @@ This project demonstrates:
 Rahul Nihalani
 
 Master's Student in AIML
-AI Engineer | NLP | GenAI | RAG | LLM Systems
+AI | NLP | GenAI | RAG | LLM Systems
 
 ---
 
