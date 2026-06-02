@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { MdOutlineDarkMode } from "react-icons/md";
 
 import { type NavbarProps } from "../../types/navbar";
@@ -10,6 +10,18 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { isAuthenticated, logout } from "../../lib/auth";
 
 import { Menu, X } from "lucide-react";
+
+const subscribe = (callback: () => void) => {
+    window.addEventListener("authChanged", callback);
+
+    return () => {
+        window.removeEventListener("authChanged", callback);
+    };
+};
+
+const getSnapshot = () => {
+    return isAuthenticated();
+};
 
 export const Navbar = ({
     mainTitle,
@@ -23,7 +35,7 @@ export const Navbar = ({
 
     useLocation();
 
-    const authenticated = isAuthenticated();
+    const authenticated = useSyncExternalStore(subscribe, getSnapshot);
 
     const handleLogout = () => {
         logout();
