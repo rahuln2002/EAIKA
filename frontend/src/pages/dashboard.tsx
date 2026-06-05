@@ -27,7 +27,7 @@ export default function DashboardPage({
                 <div className="space-y-6">
                     <div>
                         <h1 className="text-7xl font-bold tracking-tight">
-                            (Under Maintainance)
+                            (Under Maintenance)
                         </h1>
                         <br />
                         <h1 className="text-4xl font-bold tracking-tight">
