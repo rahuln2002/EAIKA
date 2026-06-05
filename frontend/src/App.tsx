@@ -11,14 +11,14 @@ import { mainTitle, links } from "./constants/navbar";
 
 import { Routes, Route } from "react-router-dom";
 
-import ProtectedRoute from "./components/common/ProtectedRoute";
+// import ProtectedRoute from "./components/common/ProtectedRoute";
 
-import LoginPage from "./pages/login";
-import RegisterPage from "./pages/register";
+// import LoginPage from "./pages/login";
+// import RegisterPage from "./pages/register";
 import DashboardPage from "./pages/dashboard";
-import ChatPage from "./pages/chat";
-import UploadPage from "./pages/upload";
-import SummarizePage from "./pages/summarize";
+// import ChatPage from "./pages/chat";
+// import UploadPage from "./pages/upload";
+// import SummarizePage from "./pages/summarize";
 
 function App() {
     const [useTheme, setUseTheme] = useState(
@@ -65,13 +65,13 @@ function App() {
                         path="/"
                         element={<DashboardPage theme={useTheme} />}
                     />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
+                    {/* <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} /> */}
                     <Route
                         path="/dashboard"
                         element={<DashboardPage theme={useTheme} />}
                     />
-                    <Route
+                    {/* <Route
                         path="/chat"
                         element={
                             <ProtectedRoute>
@@ -87,7 +87,7 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-                    <Route path="/summarize" element={<SummarizePage />} />
+                    <Route path="/summarize" element={<SummarizePage />} /> */}
                 </Routes>
             </main>
 

@@ -26,6 +26,10 @@ export default function DashboardPage({
             <div className="max-w-5xl mx-auto">
                 <div className="space-y-6">
                     <div>
+                        <h1 className="text-7xl font-bold tracking-tight">
+                            (Under Maintainance)
+                        </h1>
+                        <br />
                         <h1 className="text-4xl font-bold tracking-tight">
                             EAIKA
                         </h1>

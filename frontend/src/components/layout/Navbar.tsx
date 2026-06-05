@@ -114,15 +114,15 @@ export const Navbar = ({
                                 </>
                             ) : (
                                 <>
-                                    <li className="list-none">
+                                    <li className="list-none pointer-events-none opacity-50 select-none">
                                         <Link to="/summarize">Summarize</Link>
                                     </li>
 
-                                    <li className="list-none">
+                                    <li className="list-none pointer-events-none opacity-50 select-none">
                                         <Link to="/login">Login</Link>
                                     </li>
 
-                                    <li className="list-none">
+                                    <li className="list-none pointer-events-none opacity-50 select-none">
                                         <Link to="/register">Register</Link>
                                     </li>
                                 </>
@@ -245,7 +245,7 @@ export const Navbar = ({
                                         </>
                                     ) : (
                                         <>
-                                            <li className="list-none">
+                                            <li className="list-none pointer-events-none opacity-50 select-none">
                                                 <Link
                                                     to="/summarize"
                                                     onClick={() =>
@@ -257,7 +257,7 @@ export const Navbar = ({
                                                 </Link>
                                             </li>
 
-                                            <li className="list-none">
+                                            <li className="list-none pointer-events-none opacity-50 select-none">
                                                 <Link
                                                     to="/login"
                                                     onClick={() =>
@@ -269,7 +269,7 @@ export const Navbar = ({
                                                 </Link>
                                             </li>
 
-                                            <li className="list-none">
+                                            <li className="list-none pointer-events-none opacity-50 select-none">
                                                 <Link
                                                     to="/register"
                                                     onClick={() =>
