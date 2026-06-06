@@ -1,14 +1,14 @@
 #!/bin/sh
 
-set -x
+python -c "import app.main; print('IMPORT SUCCESS')"
 
 echo "Waiting for PostgreSQL..."
 
 sleep 15
 
-echo "Running Alembic migrations..."
+# echo "Running Alembic migrations..."
 
-alembic upgrade head
+# alembic upgrade head
 
 echo "Starting FastAPI..."
 echo "PORT=$PORT"
