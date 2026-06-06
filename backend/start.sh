@@ -14,7 +14,6 @@ from app.monitoring.healthcheck import healthcheck
 print("6")
 from app.api.router import api_router
 print("7")
-EOF
 
 echo "Waiting for PostgreSQL..."
 
