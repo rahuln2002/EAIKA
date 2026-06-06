@@ -1,15 +1,13 @@
 import redis
 
-from app.core.config.settings import settings  # noqa: F401
+from app.core.config.settings import settings
 
 # =========================================================
 # REDIS CLIENT
 # =========================================================
 
 redis_client = redis.Redis(
-    host="localhost",
-    port=6379,
-    db=0,
+    host=settings.REDIS_URL,
     decode_responses=True,
 )
 
