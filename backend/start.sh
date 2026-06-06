@@ -3,31 +3,11 @@
 set -x
 
 python - <<'EOF'
-print("analytics")
-from app.api.routes.analytics import router
+print("before service")
 
-print("auth")
-from app.api.routes.auth import router
+from app.services.chat.chat_service import ChatService
 
-print("chat")
-from app.api.routes.chat import router
-
-print("health")
-from app.api.routes.health import router
-
-print("search")
-from app.api.routes.search import router
-
-print("upload")
-from app.api.routes.upload import router
-
-print("websocket")
-from app.api.routes.websocket import router
-
-print("summarization")
-from app.api.routes.summarization import router
-
-print("DONE")
+print("after service")
 EOF
 
 echo "Waiting for PostgreSQL..."
