@@ -12,6 +12,8 @@ export const logout = () => {
     localStorage.removeItem("access_token");
 
     window.dispatchEvent(new Event("authChanged"));
+
+    window.location.href = "/login";
 };
 
 export const isAuthenticated = () => {

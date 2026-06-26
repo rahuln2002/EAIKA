@@ -1,21 +1,13 @@
 from sqlalchemy.orm import Session
 
-from app.db.models.analytics import (
-    Analytics,
-)
+from app.db.models.analytics import Analytics
 
-from app.rag.evaluators.faithfulness import (
-    FaithfulnessEvaluator,
-)
-from app.rag.evaluators.hallucination import (
-    HallucinationEvaluator,
-)
-from app.rag.evaluators.relevancy import (
-    RelevancyEvaluator,
-)
-from app.rag.evaluators.retrieval_metrics import (
-    RetrievalMetrics,
-)
+from app.rag.evaluators.faithfulness import FaithfulnessEvaluator
+from app.rag.evaluators.hallucination import HallucinationEvaluator
+from app.rag.evaluators.relevancy import RelevancyEvaluator
+from app.rag.evaluators.retrieval_metrics import RetrievalMetrics
+
+from app.monitoring.logging import logger
 
 
 class AnalyticsService:
@@ -29,32 +21,21 @@ class AnalyticsService:
         answer: str,
         retrieved_context: list[str],
     ) -> dict:
-        """
-        Run evaluation suite.
-        """
-
-        faithfulness = FaithfulnessEvaluator.evaluate(
-            answer=answer,
-            retrieved_context=retrieved_context,
-        )
-
-        hallucination = HallucinationEvaluator.evaluate(
-            answer=answer,
-            retrieved_context=retrieved_context,
-        )
-
-        relevancy = RelevancyEvaluator.evaluate(
-            query=query,
-            retrieved_context=retrieved_context,
-        )
-
-        retrieval_metrics = RetrievalMetrics.evaluate(retrieved_context)
 
         return {
-            "faithfulness": faithfulness,
-            "hallucination": hallucination,
-            "relevancy": relevancy,
-            "retrieval_metrics": retrieval_metrics,
+            "faithfulness": FaithfulnessEvaluator.evaluate(
+                answer=answer,
+                retrieved_context=retrieved_context,
+            ),
+            "hallucination": HallucinationEvaluator.evaluate(
+                answer=answer,
+                retrieved_context=retrieved_context,
+            ),
+            "relevancy": RelevancyEvaluator.evaluate(
+                query=query,
+                retrieved_context=retrieved_context,
+            ),
+            "retrieval_metrics": RetrievalMetrics.evaluate(retrieved_context),
         }
 
     @staticmethod
@@ -62,20 +43,35 @@ class AnalyticsService:
         db: Session,
         user_id: int,
         query: str,
-        response_time: float,
+        total_response_time: float,
         retrieved_chunks: int,
-    ):
+        retrieval_latency: float,
+        history_latency: float,
+        llm_latency: float,
+        provider: str = "mistral",
+        event_type: str = "chat",
+    ) -> None:
         """
         Persist analytics event.
         """
 
-        analytics = Analytics(
-            user_id=user_id,
-            query=query,
-            response_time=response_time,
-            retrieved_chunks=retrieved_chunks,
-        )
+        try:
+            analytics = Analytics(
+                user_id=user_id,
+                event_type=event_type,
+                provider=provider,
+                query=query,
+                latency=total_response_time,
+                retrieval_latency=retrieval_latency,
+                history_latency=history_latency,
+                llm_latency=llm_latency,
+                retrieved_chunks=retrieved_chunks,
+            )
 
-        db.add(analytics)
+            db.add(analytics)
+            db.commit()
 
-        db.commit()
+        except Exception as e:
+            db.rollback()
+
+            logger.warning(f"Failed to log analytics: {e}")

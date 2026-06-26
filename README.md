@@ -296,6 +296,10 @@ WS   /api/v1/ws/chat
 ## Upload
 
 ```http
+GET /api/v1/upload/status/{document_id}
+```
+
+```http
 POST /api/v1/upload
 ```
 
@@ -423,15 +427,17 @@ Integrated enterprise observability stack:
 
 ---
 
-# 📊 Performance Metrics (Soon...)
+# 📊 Performance Metrics
 
-<!-- | Metric                              | Value   |
-| ----------------------------------- | ------- |
-| Retrieval Latency                   | ~120ms  |
-| Streaming Response Latency          | ~1.4s   |
-| Hybrid Retrieval Recall Improvement | +18%    |
-| Reranking Precision Improvement     | +22%    |
-| Concurrent WebSocket Support        | Enabled | -->
+The reported values represent the maximum response context length. Actual response times may be lower for shorter responses, improving latency by upto ~70%.
+
+| Metric                         | Without Redis | With Redis |
+| ------------------------------ | ------------- | ---------- |
+| Retrieval Latency              | ~0.8 s        | ~1 ms      |
+| Streaming Response Latency     | ~1.8 s        | ~1.2 s     |
+| Total Latency                  | ~2.7 s        | ~1.2 s     |
+| Latency Improvement Percentage | ~55%          |
+| Concurrent WebSocket Support   | Enabled       |
 
 ---
 

@@ -73,7 +73,9 @@ class Settings(BaseSettings):
     # EMBEDDINGS
     # =========================================================
 
-    EMBEDDING_MODEL: str = "BAAI/bge-small-en"
+    JINA_API_KEY: str
+    EMBEDDING_API_URL: str = "https://api.jina.ai/v1/embeddings"
+    # EMBEDDING_MODEL: str
 
     # =========================================================
     # LOGGING

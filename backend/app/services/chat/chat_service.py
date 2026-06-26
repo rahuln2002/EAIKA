@@ -1,3 +1,5 @@
+from app.core.constants.cache_constants import CHAT_PREFIX, CHAT_TTL
+from app.cache.cache_manager import CacheManager
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
@@ -13,6 +15,13 @@ class ChatService:
     """
     Persistent conversational RAG service.
     """
+
+    @staticmethod
+    def _history_cache_key(
+        chat_id: int,
+    ) -> str:
+
+        return f"{CHAT_PREFIX}:{chat_id}:history"
 
     @staticmethod
     def create_chat(
@@ -79,17 +88,53 @@ class ChatService:
 
         db.refresh(message)
 
+        cache_key = ChatService._history_cache_key(
+            chat_id,
+        )
+
+        history = CacheManager.get(
+            cache_key,
+        )
+
+        if history is not None:
+            history = (
+                history
+                + [
+                    {
+                        "role": role,
+                        "content": content,
+                    }
+                ]
+            )[-20:]
+
+            CacheManager.set(
+                cache_key,
+                history,
+                expire=CHAT_TTL,
+            )
+
         return message
 
     @staticmethod
     def get_chat_history(
         db: Session,
         chat_id: int,
-        limit: int = 10,
+        limit: int = 20,
     ) -> list[dict]:
         """
         Retrieve recent chat history.
         """
+
+        cache_key = ChatService._history_cache_key(
+            chat_id,
+        )
+
+        cached = CacheManager.get(
+            cache_key,
+        )
+
+        if cached is not None:
+            return cached
 
         messages = (
             db.query(Message)
@@ -101,13 +146,21 @@ class ChatService:
 
         messages.reverse()
 
-        return [
+        history = [
             {
                 "role": message.role,
                 "content": message.content,
             }
             for message in messages
         ]
+
+        CacheManager.set(
+            cache_key,
+            history,
+            expire=CHAT_TTL,
+        )
+
+        return history
 
     @staticmethod
     def generate_rag_response(
@@ -172,7 +225,7 @@ class ChatService:
     def list_user_chats(
         db: Session,
         user_id: int,
-    ):
+    ) -> list[dict]:
         """
         Retrieve user chats.
         """

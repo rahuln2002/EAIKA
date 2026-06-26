@@ -1,21 +1,34 @@
 import api from "../lib/axios";
 
-export const uploadDocument =
-  async (file: File) => {
+export const uploadDocument = async (
+    file: File,
+) => {
     const formData = new FormData();
 
-    formData.append("file", file);
+    formData.append(
+        "file",
+        file,
+    );
 
     const response = await api.post(
-      "/upload/",
-      formData,
-      {
-        headers: {
-          "Content-Type":
-            "multipart/form-data",
+        "/upload/",
+        formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
         },
-      }
     );
 
     return response.data;
-  };
+};
+
+export const getUploadStatus = async (
+    documentId: number,
+) => {
+    const response = await api.get(
+        `/upload/status/${documentId}`,
+    );
+
+    return response.data;
+};

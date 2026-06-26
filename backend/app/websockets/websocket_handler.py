@@ -7,7 +7,7 @@ from fastapi import (
 )
 
 from jose import jwt
-from jose import JWTError
+from jose.exceptions import JWTError, ExpiredSignatureError
 
 from sqlalchemy.orm import Session
 
@@ -76,19 +76,51 @@ class WebSocketHandler:
             # AUTHENTICATE USER
             # =================================================
 
-            payload = jwt.decode(
-                token,
-                settings.JWT_SECRET_KEY,
-                algorithms=["HS256"],
-            )
+            if not token:
+                await websocket.close(
+                    code=4003,
+                    reason="Unauthorized",
+                )
+                return
+
+            try:
+                payload = jwt.decode(
+                    token,
+                    settings.JWT_SECRET_KEY,
+                    algorithms=["HS256"],
+                )
+
+            except ExpiredSignatureError:
+                await websocket.close(
+                    code=4002,
+                    reason="Token expired",
+                )
+                return
+
+            except JWTError:
+                await websocket.close(
+                    code=4001,
+                    reason="Invalid token",
+                )
+                return
 
             sub = payload.get("sub")
 
-            if sub is None:
-                await websocket.close(code=4001)
+            if not sub:
+                await websocket.close(
+                    code=4003,
+                    reason="Unauthorized",
+                )
                 return
 
-            user_id = int(sub)
+            try:
+                user_id = int(sub)
+            except (TypeError, ValueError):
+                await websocket.close(
+                    code=4003,
+                    reason="Unauthorized",
+                )
+                return
 
             # =================================================
             # CHAT SESSION
@@ -102,7 +134,10 @@ class WebSocketHandler:
                 )
 
                 if not chat:
-                    await websocket.close(code=4004)
+                    await websocket.close(
+                        code=4004,
+                        reason="Chat not found",
+                    )
                     return
 
             else:
@@ -122,7 +157,7 @@ class WebSocketHandler:
 
             retrieval_service = RetrievalService()
 
-            while websocket.client_state.name == "CONNECTED":
+            while True:
                 query = await websocket.receive_text()
 
                 start_time = time.time()
@@ -131,6 +166,8 @@ class WebSocketHandler:
                 # RETRIEVE CONTEXT
                 # =============================================
 
+                retrieval_start = time.perf_counter()
+
                 retrieved_chunks = retrieval_service.retrieve_context(
                     query=query,
                     db=db,
@@ -138,14 +175,20 @@ class WebSocketHandler:
                     top_k=5,
                 )
 
+                retrieval_time = time.perf_counter() - retrieval_start
+
                 # =============================================
                 # CONVERSATION HISTORY
                 # =============================================
+
+                history_start = time.perf_counter()
 
                 conversation_history = ChatService.get_chat_history(
                     db=db,
                     chat_id=chat.id,
                 )
+
+                history_time = time.perf_counter() - history_start
 
                 # =============================================
                 # SAVE USER MESSAGE
@@ -172,6 +215,8 @@ class WebSocketHandler:
                 # STREAM RESPONSE
                 # =============================================
 
+                llm_start = time.perf_counter()
+
                 stream = ProviderManager.stream_response(
                     provider="groq",
                     prompt=prompt,
@@ -181,10 +226,10 @@ class WebSocketHandler:
 
                 buffer = ""
 
-                for token in stream:
-                    full_response += token
+                for text in stream:
+                    full_response += text
 
-                    buffer += token
+                    buffer += text
 
                     # =========================================
                     # STREAM BUFFER
@@ -208,6 +253,14 @@ class WebSocketHandler:
                         buffer,
                     )
 
+                llm_time = time.perf_counter() - llm_start
+
+                evaluation = AnalyticsService.evaluate_response(
+                    query=query,
+                    answer=full_response,
+                    retrieved_context=[chunk["content"] for chunk in retrieved_chunks],
+                )
+
                 # =============================================
                 # SAVE ASSISTANT MESSAGE
                 # =============================================
@@ -219,13 +272,9 @@ class WebSocketHandler:
                     content=full_response,
                 )
 
-                # =============================================
-                # SEND SOURCES
-                # =============================================
-
-                await manager.send_sources(
+                await manager.send_evaluation(
                     websocket,
-                    retrieved_chunks,
+                    evaluation,
                 )
 
                 # =============================================
@@ -240,24 +289,24 @@ class WebSocketHandler:
                 # ANALYTICS
                 # =============================================
 
-                response_time = time.time() - start_time
+                total_response_time = time.time() - start_time
 
                 try:
                     AnalyticsService.log_analytics(
                         db=db,
                         user_id=user_id,
                         query=query,
-                        response_time=response_time,
+                        total_response_time=total_response_time,
+                        retrieval_latency=retrieval_time,
+                        history_latency=history_time,
+                        llm_latency=llm_time,
                         retrieved_chunks=len(retrieved_chunks),
                     )
                 except Exception as e:
                     logger.warning(f"Failed to log analytics: {e}")
 
-        except JWTError:
-            await websocket.close(code=4001)
-
         except WebSocketDisconnect:
-            manager.disconnect(websocket)
+            pass
 
         except Exception as e:
             traceback.print_exc()
@@ -265,25 +314,20 @@ class WebSocketHandler:
             logger.warning(f"WebSocket Error: {e}")
 
             try:
-                await websocket.send_json(
-                    {
-                        "type": "error",
-                        "data": str(e),
-                    }
-                )
+                if websocket.client_state.name == "CONNECTED":
+                    await websocket.send_json(
+                        {
+                            "type": "error",
+                            "data": str(e),
+                        }
+                    )
 
-                await manager.send_end(
-                    websocket,
-                )
+                    await manager.send_end(websocket)
 
-                await websocket.close(
-                    code=1011,
-                )
-
+                    await websocket.close(code=1011)
             except Exception:
                 logger.warning("Failed to send error message to client.")
 
-            manager.disconnect(websocket)
-
         finally:
+            manager.disconnect(websocket)
             db.close()

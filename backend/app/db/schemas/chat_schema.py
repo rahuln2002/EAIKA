@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from typing import Optional
-from typing import Any
 
 from pydantic import (
     BaseModel,
@@ -57,14 +56,31 @@ class SourceResponse(BaseModel):
 # =========================================================
 
 
+class FaithfulnessResponse(BaseModel):
+    faithfulness_score: float
+    matched_terms: int
+    total_terms: int
+
+
+class HallucinationResponse(BaseModel):
+    hallucination_score: float
+    hallucinated_terms: list[str]
+
+
+class RelevancyResponse(BaseModel):
+    avg_relevancy_score: float
+
+
+class RetrievalMetricsResponse(BaseModel):
+    retrieved_chunks: int
+    avg_chunk_length: float
+
+
 class EvaluationResponse(BaseModel):
-    faithfulness: float
-
-    hallucination: float
-
-    relevancy: float
-
-    retrieval_metrics: dict[str, Any]
+    faithfulness: FaithfulnessResponse
+    hallucination: HallucinationResponse
+    relevancy: RelevancyResponse
+    retrieval_metrics: RetrievalMetricsResponse
 
 
 # =========================================================

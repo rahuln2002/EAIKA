@@ -1,6 +1,4 @@
-from qdrant_client import (
-    QdrantClient,
-)
+from qdrant_client import QdrantClient
 
 from qdrant_client.models import (
     Distance,
@@ -22,7 +20,7 @@ class QdrantStore:
 
     def __init__(
         self,
-        embedding_dimension: int = 384,
+        embedding_dimension: int = 1024,
     ) -> None:
 
         self.embedding_dimension = embedding_dimension

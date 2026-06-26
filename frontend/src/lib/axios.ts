@@ -1,21 +1,39 @@
 import axios from "axios";
 
+import { logout } from "./auth";
+
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_URL
+    baseURL: import.meta.env.VITE_API_URL,
 });
+
+// ===================================================
+// REQUEST INTERCEPTOR
+// ===================================================
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem(
-    "access_token"
-  );
+    const token = localStorage.getItem("access_token");
 
-  if (token) {
-    config.headers.Authorization =
-      `Bearer ${token}`;
-  }
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
 
-  return config;
+    return config;
 });
+
+// ===================================================
+// RESPONSE INTERCEPTOR
+// ===================================================
+
+api.interceptors.response.use(
+    (response) => response,
+
+    (error) => {
+        if (error.response?.status === 401) {
+            logout();
+        }
+
+        return Promise.reject(error);
+    },
+);
 
 export default api;

@@ -1,31 +1,24 @@
+import hashlib
+
 from sqlalchemy.orm import Session
 
-from app.db.models.chunk import Chunk
-from app.rag.retrievers.dense_retriever import (
-    DenseRetriever,
+from app.cache.cache_manager import CacheManager
+from app.core.constants.cache_constants import (
+    RAG_PREFIX,
+    RAG_TTL,
 )
+from app.db.models.chunk import Chunk
+from app.db.models.document import Document
 
-# from app.services.reranking.reranker_service import (
-#     RerankerService,
-# )
 from app.rag.retrievers.hybrid_retriever import (
     HybridRetriever,
-)
-from app.db.models.document import (
-    Document,
 )
 
 
 class RetrievalService:
     """
-    Production retrieval service.
+    Production retrieval service with Redis caching.
     """
-
-    def __init__(
-        self,
-        provider: str = "qdrant",
-    ) -> None:
-        self.retriever = DenseRetriever(provider=provider)
 
     def retrieve_context(
         self,
@@ -39,8 +32,19 @@ class RetrievalService:
         Retrieve relevant chunks.
         """
 
+        cache_key = (
+            f"{RAG_PREFIX}:{user_id}:{hashlib.sha256(query.encode()).hexdigest()}"
+        )
+
+        cached = CacheManager.get(
+            cache_key,
+        )
+
+        if cached is not None:
+            return cached
+
         # =============================================
-        # GET DOCUMENT CORPUS
+        # LOAD USER DOCUMENTS
         # =============================================
 
         documents = self.get_user_chunk_texts(
@@ -49,10 +53,12 @@ class RetrievalService:
         )
 
         # =============================================
-        # HYBRID RETRIEVER
+        # HYBRID RETRIEVAL
         # =============================================
 
-        hybrid_retriever = HybridRetriever(documents=documents)
+        hybrid_retriever = HybridRetriever(
+            documents=documents,
+        )
 
         retrieved_chunks = hybrid_retriever.retrieve(
             query=query,
@@ -60,41 +66,26 @@ class RetrievalService:
         )
 
         # =============================================
-        # RERANK RESULTS
+        # OPTIONAL RERANKING
         # =============================================
 
-        # reranked_chunks = RerankerService.rerank(
-        #     query=query,
-        #     documents=retrieved_chunks,
-        #     top_k=top_k,
-        # )
+        # retrieved_chunks = RerankerService.rerank(...)
 
-        # final_results = []
-
-        # for idx, chunk_text in enumerate(reranked_chunks):
-        #     chunk = db.query(Chunk).filter(Chunk.content == chunk_text).first()
-
-        #     if not chunk:
-        #         continue
-
-        #     final_results.append(
-        #         {
-        #             "chunk_id": chunk.id,
-        #             "document_id": (chunk.document_id),
-        #             "content": chunk.content,
-        #             "citation": f"[{idx + 1}]",
-        #         }
-        #     )
+        CacheManager.set(
+            cache_key,
+            retrieved_chunks,
+            expire=RAG_TTL,
+        )
 
         return retrieved_chunks
 
+    @staticmethod
     def get_user_chunk_texts(
-        self,
         db: Session,
         user_id: int,
     ) -> list[str]:
         """
-        Retrieve user-owned chunk texts.
+        Retrieve all user-owned chunk texts.
         """
 
         chunks = (
@@ -103,7 +94,9 @@ class RetrievalService:
                 Document,
                 Chunk.document_id == Document.id,
             )
-            .filter(Document.owner_id == user_id)
+            .filter(
+                Document.owner_id == user_id,
+            )
             .all()
         )
 

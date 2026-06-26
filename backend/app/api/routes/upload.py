@@ -29,11 +29,38 @@ from app.utils.validators import (
     validate_file_extension,
     validate_file_size,
 )
+from app.cache.cache_manager import (
+    CacheManager,
+)
+from app.core.constants.cache_constants import (
+    UPLOAD_PREFIX,
+)
 
 router = APIRouter(
     prefix="/upload",
     tags=["Upload"],
 )
+
+
+@router.get("/status/{document_id}")
+async def get_upload_status(
+    document_id: int,
+):
+    """
+    Get upload progress from Redis.
+    """
+
+    progress = CacheManager.get(
+        f"{UPLOAD_PREFIX}:{document_id}",
+    )
+
+    if progress is None:
+        return {
+            "status": "queued",
+            "progress": 0,
+        }
+
+    return progress
 
 
 @router.post("/")

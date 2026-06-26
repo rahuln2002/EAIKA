@@ -6,8 +6,8 @@ from app.core.config.settings import settings
 # REDIS CLIENT
 # =========================================================
 
-redis_client = redis.Redis(
-    host=settings.REDIS_URL,
+redis_client = redis.Redis.from_url(
+    url=settings.REDIS_URL,
     decode_responses=True,
 )
 

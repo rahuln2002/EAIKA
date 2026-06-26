@@ -31,7 +31,8 @@ class ConnectionManager:
         Remove connection.
         """
 
-        self.active_connections.remove(websocket)
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
 
     async def send_token(
         self,
@@ -57,19 +58,6 @@ class ConnectionManager:
             }
         )
 
-    async def send_sources(
-        self,
-        websocket: WebSocket,
-        sources,
-    ):
-
-        await websocket.send_json(
-            {
-                "type": "sources",
-                "data": sources,
-            }
-        )
-
     async def send_chat_id(
         self,
         websocket: WebSocket,
@@ -80,5 +68,21 @@ class ConnectionManager:
             {
                 "type": "chat_id",
                 "data": chat_id,
+            }
+        )
+
+    async def send_evaluation(
+        self,
+        websocket: WebSocket,
+        evaluation: dict,
+    ):
+        """
+        Send response evaluation.
+        """
+
+        await websocket.send_json(
+            {
+                "type": "evaluation",
+                "data": evaluation,
             }
         )

@@ -9,10 +9,6 @@ from app.core.config.settings import settings
 
 database_url = settings.DATABASE_URL
 
-# ============================================
-# FIX RAILWAY POSTGRES URL
-# ============================================
-
 if database_url.startswith("postgres://"):
     database_url = database_url.replace(
         "postgres://",

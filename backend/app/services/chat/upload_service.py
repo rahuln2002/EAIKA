@@ -1,9 +1,12 @@
 from sqlalchemy.orm import Session
 
-from app.db.models.chunk import Chunk
-from app.db.models.document import (
-    Document,
+from app.cache.cache_manager import CacheManager
+from app.core.constants.cache_constants import (
+    UPLOAD_PREFIX,
+    UPLOAD_TTL,
 )
+from app.db.models.chunk import Chunk
+from app.db.models.document import Document
 from app.rag.chunking.recursive_chunker import (
     RecursiveChunker,
 )
@@ -17,8 +20,27 @@ from app.services.embeddings.embedding_manager import (
 
 class UploadService:
     """
-    Persistent upload + vector sync service.
+    Persistent upload + vector synchronization service.
     """
+
+    @staticmethod
+    def _update_progress(
+        document_id: int,
+        status: str,
+        progress: int,
+    ) -> None:
+        """
+        Store upload progress in Redis.
+        """
+
+        CacheManager.set(
+            key=f"{UPLOAD_PREFIX}:{document_id}",
+            value={
+                "status": status,
+                "progress": progress,
+            },
+            expire=UPLOAD_TTL,
+        )
 
     @staticmethod
     def create_document(
@@ -43,6 +65,12 @@ class UploadService:
 
         db.refresh(document)
 
+        UploadService._update_progress(
+            document.id,
+            "created",
+            5,
+        )
+
         return document
 
     @staticmethod
@@ -53,24 +81,34 @@ class UploadService:
         owner_id: int,
     ) -> int:
         """
-        Persist chunks + sync embeddings.
+        Persist chunks and synchronize embeddings.
         """
+
+        UploadService._update_progress(
+            document_id,
+            "chunking",
+            15,
+        )
 
         chunker = RecursiveChunker()
 
-        chunks = chunker.chunk_text(text)
-
-        # =================================================
-        # STORE CHUNKS IN POSTGRES
-        # =================================================
+        chunks = chunker.chunk_text(
+            text,
+        )
 
         stored_chunks = []
 
-        for idx, chunk_text in enumerate(chunks):
+        UploadService._update_progress(
+            document_id,
+            "saving_chunks",
+            35,
+        )
+
+        for index, chunk_text in enumerate(chunks):
             chunk = Chunk(
                 document_id=document_id,
                 content=chunk_text,
-                chunk_index=idx,
+                chunk_index=index,
             )
 
             db.add(chunk)
@@ -79,44 +117,48 @@ class UploadService:
 
         db.commit()
 
-        # =================================================
-        # REFRESH TO GET IDS
-        # =================================================
-
         for chunk in stored_chunks:
             db.refresh(chunk)
 
-        # =================================================
-        # GENERATE EMBEDDINGS
-        # =================================================
+        UploadService._update_progress(
+            document_id,
+            "generating_embeddings",
+            60,
+        )
 
-        embeddings = EmbeddingManager.embed_texts(chunks)
+        embeddings = EmbeddingManager.embed_texts(
+            chunks,
+        )
 
-        # =================================================
-        # VECTOR METADATA
-        # =================================================
+        metadata = [
+            {
+                "chunk_id": chunk.id,
+                "document_id": chunk.document_id,
+                "owner_id": owner_id,
+                "text": chunk.content,
+            }
+            for chunk in stored_chunks
+        ]
 
-        metadata = []
+        UploadService._update_progress(
+            document_id,
+            "indexing_vectors",
+            85,
+        )
 
-        for chunk in stored_chunks:
-            metadata.append(
-                {
-                    "chunk_id": chunk.id,
-                    "document_id": chunk.document_id,
-                    "owner_id": owner_id,
-                    "text": chunk.content,
-                }
-            )
-
-        # =================================================
-        # STORE IN VECTOR DB
-        # =================================================
-
-        vectorstore = VectorStoreManager(provider="qdrant")
+        vectorstore = VectorStoreManager(
+            provider="qdrant",
+        )
 
         vectorstore.add_embeddings(
             embeddings=embeddings,
             metadata=metadata,
+        )
+
+        UploadService._update_progress(
+            document_id,
+            "completed",
+            100,
         )
 
         return len(chunks)

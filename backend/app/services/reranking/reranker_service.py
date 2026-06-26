@@ -1,55 +1,55 @@
-from sentence_transformers import (
-    CrossEncoder,
-)
+# from sentence_transformers import (
+#     CrossEncoder,
+# )
 
 
-class RerankerService:
-    """
-    Cross-encoder reranking service.
-    """
+# class RerankerService:
+#     """
+#     Cross-encoder reranking service.
+#     """
 
-    MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+#     MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
-    model = CrossEncoder(MODEL_NAME)
+#     model = CrossEncoder(MODEL_NAME)
 
-    @classmethod
-    def rerank(
-        cls,
-        query: str,
-        documents: list[str],
-        top_k: int = 5,
-    ) -> list[str]:
-        """
-        Rerank retrieved documents.
-        """
+#     @classmethod
+#     def rerank(
+#         cls,
+#         query: str,
+#         documents: list[str],
+#         top_k: int = 5,
+#     ) -> list[str]:
+#         """
+#         Rerank retrieved documents.
+#         """
 
-        if not documents:
-            return []
+#         if not documents:
+#             return []
 
-        # =============================================
-        # BUILD QUERY-DOCUMENT PAIRS
-        # =============================================
+#         # =============================================
+#         # BUILD QUERY-DOCUMENT PAIRS
+#         # =============================================
 
-        pairs = [[query, doc] for doc in documents]
+#         pairs = [[query, doc] for doc in documents]
 
-        # =============================================
-        # SCORE DOCUMENTS
-        # =============================================
+#         # =============================================
+#         # SCORE DOCUMENTS
+#         # =============================================
 
-        scores = cls.model.predict(pairs)
+#         scores = cls.model.predict(pairs)
 
-        # =============================================
-        # SORT BY SCORE
-        # =============================================
+#         # =============================================
+#         # SORT BY SCORE
+#         # =============================================
 
-        ranked_results = sorted(
-            zip(documents, scores),
-            key=lambda x: x[1],
-            reverse=True,
-        )
+#         ranked_results = sorted(
+#             zip(documents, scores),
+#             key=lambda x: x[1],
+#             reverse=True,
+#         )
 
-        # =============================================
-        # RETURN TOP-K
-        # =============================================
+#         # =============================================
+#         # RETURN TOP-K
+#         # =============================================
 
-        return [doc for doc, _ in ranked_results[:top_k]]
+#         return [doc for doc, _ in ranked_results[:top_k]]

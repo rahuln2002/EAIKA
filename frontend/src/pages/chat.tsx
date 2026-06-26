@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 import { createWebSocket } from "../lib/websocket";
+import { logout } from "../lib/auth";
 
 import { useChatStore } from "../store/chatStore";
 
@@ -10,6 +11,30 @@ export default function ChatPage() {
     // ===================================================
 
     const [query, setQuery] = useState("");
+
+    type Evaluation = {
+        faithfulness: {
+            faithfulness_score: number;
+            matched_terms: number;
+            total_terms: number;
+        };
+
+        hallucination: {
+            hallucination_score: number;
+            hallucinated_terms: string[];
+        };
+
+        relevancy: {
+            avg_relevancy_score: number;
+        };
+
+        retrieval_metrics: {
+            retrieved_chunks: number;
+            avg_chunk_length: number;
+        };
+    };
+
+    const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
 
     const websocketRef = useRef<WebSocket | null>(null);
 
@@ -24,9 +49,6 @@ export default function ChatPage() {
 
         messages,
         addMessage,
-
-        // sources,
-        setSources,
 
         streaming,
         setStreaming,
@@ -85,6 +107,14 @@ export default function ChatPage() {
                 if (parsed.type === "error") {
                     console.error(parsed.data);
 
+                    if (
+                        parsed.data === "Unauthorized" ||
+                        parsed.data === "Token expired"
+                    ) {
+                        logout();
+                        return;
+                    }
+
                     setStreaming(false);
 
                     return;
@@ -96,8 +126,8 @@ export default function ChatPage() {
                     return;
                 }
 
-                if (parsed.type === "sources") {
-                    setSources(parsed.data);
+                if (parsed.type === "evaluation") {
+                    setEvaluation(parsed.data);
 
                     return;
                 }
@@ -115,7 +145,7 @@ export default function ChatPage() {
                 console.error(error);
             }
         },
-        [setChatId, setSources, setStreaming],
+        [setChatId, setStreaming],
     );
 
     // ===================================================
@@ -137,10 +167,12 @@ export default function ChatPage() {
 
         ws.onmessage = handleMessage;
 
-        ws.onclose = () => {
-            console.log("WebSocket disconnected");
-
+        ws.onclose = (event) => {
             setStreaming(false);
+
+            if (event.code === 4001) {
+                logout();
+            }
         };
 
         ws.onerror = (error) => {
@@ -193,7 +225,7 @@ export default function ChatPage() {
         // RESET SOURCES
         // ===============================================
 
-        setSources([]);
+        setEvaluation(null);
 
         // ===============================================
         // USER MESSAGE
@@ -263,30 +295,73 @@ export default function ChatPage() {
                 ))}
 
                 {/* ===================================== */}
-                {/* SOURCES */}
+                {/* RESPONSE ANALYTICS */}
                 {/* ===================================== */}
 
-                {/* {sources.length > 0 && (
-                    <div className="border rounded-xl p-4 mb-4 bg-gray-50">
-                        <h2 className="text-xl font-bold mb-4">Sources</h2>
+                {evaluation && (
+                    <div className="mb-6 rounded-xl border bg-blue-50 p-4">
+                        <h2 className="mb-3 text-lg font-semibold">
+                            Response Analytics
+                        </h2>
 
-                        {sources.map((source, idx) => (
-                            <div key={idx} className="mb-4 border-b pb-2">
-                                <div className="font-semibold">
-                                    {source.citation || `Source ${idx + 1}`}
-                                </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-sm text-gray-600">
+                                    Faithfulness
+                                </p>
 
-                                <div className="text-sm text-gray-500">
-                                    Document ID: {source.document_id}
-                                </div>
-
-                                <div className="mt-2 text-sm whitespace-pre-wrap">
-                                    {source.content}
-                                </div>
+                                <p className="font-bold text-green-600">
+                                    {(
+                                        evaluation.faithfulness
+                                            .faithfulness_score * 100
+                                    ).toFixed(1)}
+                                    %
+                                </p>
                             </div>
-                        ))}
+
+                            <div>
+                                <p className="text-sm text-gray-600">
+                                    Hallucination
+                                </p>
+
+                                <p className="font-bold text-red-600">
+                                    {(
+                                        evaluation.hallucination
+                                            .hallucination_score * 100
+                                    ).toFixed(1)}
+                                    %
+                                </p>
+                            </div>
+
+                            <div>
+                                <p className="text-sm text-gray-600">
+                                    Relevancy
+                                </p>
+
+                                <p className="font-bold text-blue-600">
+                                    {(
+                                        evaluation.relevancy
+                                            .avg_relevancy_score * 100
+                                    ).toFixed(1)}
+                                    %
+                                </p>
+                            </div>
+
+                            <div>
+                                <p className="text-sm text-gray-600">
+                                    Retrieved Chunks
+                                </p>
+
+                                <p className="font-bold">
+                                    {
+                                        evaluation.retrieval_metrics
+                                            .retrieved_chunks
+                                    }
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                )} */}
+                )}
 
                 {/* ===================================== */}
                 {/* STREAMING */}
