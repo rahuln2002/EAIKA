@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 
 import { useNavigate } from "react-router-dom";
 
+import axios from "axios";
+
 import { useUploadDocument } from "../hooks/useUploadDocument";
 import { getUploadStatus } from "../services/uploadService";
 
@@ -46,10 +48,11 @@ export default function UploadPage() {
                         navigate("/chat");
                     }, 500);
                 }
-            } catch (error: any) {
-                clearInterval(interval);
-
-                if (error.response?.status === 401) {
+            } catch (error: unknown) {
+                if (
+                    axios.isAxiosError(error) &&
+                    error.response?.status === 401
+                ) {
                     logout();
                     return;
                 }
