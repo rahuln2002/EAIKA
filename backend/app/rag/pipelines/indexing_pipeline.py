@@ -1,11 +1,11 @@
 from app.rag.chunking.recursive_chunker import (
     RecursiveChunker,
 )
-from app.services.embeddings.embedding_manager import (
-    EmbeddingManager,
-)
 from app.rag.vectorstore.vectorstore_manager import (
     VectorStoreManager,
+)
+from app.services.embeddings.embedding_manager import (
+    EmbeddingManager,
 )
 
 

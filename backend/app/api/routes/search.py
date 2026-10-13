@@ -1,7 +1,3 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from sqlalchemy.orm import Session
-
 from app.api.dependencies.auth import (
     get_current_user,
 )
@@ -11,6 +7,8 @@ from app.api.dependencies.database import (
 from app.services.retrieval.retrieval_service import (
     RetrievalService,
 )
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
 router = APIRouter(
     prefix="/search",

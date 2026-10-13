@@ -4,6 +4,13 @@ from app.api.middleware import (
     setup_auth_middleware,
     setup_cors,
 )
+from app.api.middleware.logging import (
+    LoggingMiddleware,
+)
+from app.api.middleware.metrics import (
+    MetricsMiddleware,
+)
+from app.api.router import api_router
 from app.core.config import (
     logger,
     settings,
@@ -12,19 +19,8 @@ from app.core.config import (
 from app.exceptions import (
     register_exception_handlers,
 )
-
-from app.monitoring.prometheus import router as prometheus_router
 from app.monitoring.healthcheck import healthcheck
-
-from app.api.router import api_router
-
-from app.api.middleware.logging import (
-    LoggingMiddleware,
-)
-
-from app.api.middleware.metrics import (
-    MetricsMiddleware,
-)
+from app.monitoring.prometheus import router as prometheus_router
 
 # =========================================================
 # INITIALIZE APP

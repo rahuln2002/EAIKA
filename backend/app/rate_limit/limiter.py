@@ -1,8 +1,7 @@
-from fastapi import HTTPException, status
-
 from app.cache.redis_client import (
     get_redis_client,
 )
+from fastapi import HTTPException, status
 
 redis_client = get_redis_client()
 

@@ -3,7 +3,6 @@ from app.db.base_class import Base
 # =============================================
 # IMPORT ALL MODELS
 # =============================================
-
 from app.db.models.analytics import Analytics
 from app.db.models.chat import Chat
 from app.db.models.chunk import Chunk

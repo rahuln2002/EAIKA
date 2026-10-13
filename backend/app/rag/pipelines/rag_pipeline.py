@@ -1,7 +1,11 @@
 from sqlalchemy.orm import Session
 
+from app.monitoring.logging import logger
 from app.rag.prompts.retrieval_prompt import (
     build_rag_prompt,
+)
+from app.services.analytics.analytics_service import (
+    AnalyticsService,
 )
 from app.services.llm.provider_manager import (
     ProviderManager,
@@ -9,13 +13,9 @@ from app.services.llm.provider_manager import (
 from app.services.retrieval.retrieval_service import (
     RetrievalService,
 )
-from app.services.analytics.analytics_service import (
-    AnalyticsService,
-)
 from app.telemetry.observability import (
     trace_function,
 )
-from app.monitoring.logging import logger
 
 
 class RAGPipeline:

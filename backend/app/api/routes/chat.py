@@ -1,33 +1,27 @@
+from app.api.dependencies.auth import (
+    get_current_user,
+)
+from app.api.dependencies.database import (
+    get_db,
+)
+from app.db.schemas.chat_schema import (
+    ChatHistoryResponse,
+    ChatListResponse,
+    ChatRequest,
+    ConversationalChatResponse,
+)
+from app.services.chat.chat_service import (
+    ChatService,
+)
+from app.utils.citation_formatter import (
+    format_sources,
+)
 from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
 )
-
 from sqlalchemy.orm import Session
-
-from app.api.dependencies.auth import (
-    get_current_user,
-)
-
-from app.api.dependencies.database import (
-    get_db,
-)
-
-from app.db.schemas.chat_schema import (
-    ChatRequest,
-    ConversationalChatResponse,
-    ChatHistoryResponse,
-    ChatListResponse,
-)
-
-from app.services.chat.chat_service import (
-    ChatService,
-)
-
-from app.utils.citation_formatter import (
-    format_sources,
-)
 
 router = APIRouter(
     prefix="/chat",

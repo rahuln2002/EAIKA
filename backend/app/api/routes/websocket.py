@@ -1,11 +1,10 @@
-from fastapi import (
-    APIRouter,
-    WebSocket,
-    Query,
-)
-
 from app.websockets.websocket_handler import (
     WebSocketHandler,
+)
+from fastapi import (
+    APIRouter,
+    Query,
+    WebSocket,
 )
 
 router = APIRouter()

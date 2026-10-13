@@ -9,7 +9,6 @@ from app.core.constants.cache_constants import (
 )
 from app.db.models.chunk import Chunk
 from app.db.models.document import Document
-
 from app.rag.retrievers.hybrid_retriever import (
     HybridRetriever,
 )
@@ -32,9 +31,7 @@ class RetrievalService:
         Retrieve relevant chunks.
         """
 
-        cache_key = (
-            f"{RAG_PREFIX}:{user_id}:{hashlib.sha256(query.encode()).hexdigest()}"
-        )
+        cache_key = f"{RAG_PREFIX}:{user_id}:{hashlib.sha256(query.encode()).hexdigest()}"
 
         cached = CacheManager.get(
             cache_key,

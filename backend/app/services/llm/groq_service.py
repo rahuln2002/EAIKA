@@ -3,7 +3,6 @@ from groq import Groq
 from app.core.config.settings import (
     settings,
 )
-
 from app.monitoring.logging import logger
 
 

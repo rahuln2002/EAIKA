@@ -1,14 +1,14 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import File
-from fastapi import UploadFile
-from sqlalchemy.orm import Session
-
 from app.api.dependencies.auth import (
     get_current_user,
 )
 from app.api.dependencies.database import (
     get_db,
+)
+from app.cache.cache_manager import (
+    CacheManager,
+)
+from app.core.constants.cache_constants import (
+    UPLOAD_PREFIX,
 )
 from app.rag.ingestion.cleaner import (
     clean_text,
@@ -29,12 +29,8 @@ from app.utils.validators import (
     validate_file_extension,
     validate_file_size,
 )
-from app.cache.cache_manager import (
-    CacheManager,
-)
-from app.core.constants.cache_constants import (
-    UPLOAD_PREFIX,
-)
+from fastapi import APIRouter, Depends, File, UploadFile
+from sqlalchemy.orm import Session
 
 router = APIRouter(
     prefix="/upload",

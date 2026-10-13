@@ -1,9 +1,9 @@
 import os
 
+from app.monitoring.logging import logger
 from app.workers.celery_workers import (
     celery_app,
 )
-from app.monitoring.logging import logger
 
 TEMP_DIRECTORY = "data/temp"
 

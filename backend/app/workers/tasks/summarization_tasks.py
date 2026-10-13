@@ -1,8 +1,8 @@
-from app.workers.celery_workers import (
-    celery_app,
-)
 from app.services.summarization.summarization_service import (
     SummarizationService,
+)
+from app.workers.celery_workers import (
+    celery_app,
 )
 
 

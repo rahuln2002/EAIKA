@@ -1,8 +1,7 @@
-from fastapi import APIRouter
-
 from app.services.summarization.summarization_service import (
     SummarizationService,
 )
+from fastapi import APIRouter
 
 router = APIRouter(
     prefix="/summarization",

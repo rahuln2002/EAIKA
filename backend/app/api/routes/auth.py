@@ -1,8 +1,3 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
-from sqlalchemy.orm import Session
-
 from app.api.dependencies.database import (
     get_db,
 )
@@ -14,6 +9,8 @@ from app.db.schemas.auth_schema import (
 from app.services.auth.auth_service import (
     AuthService,
 )
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
 router = APIRouter(
     prefix="/auth",

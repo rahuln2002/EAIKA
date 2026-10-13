@@ -1,13 +1,11 @@
 from sqlalchemy.orm import Session
 
 from app.db.models.analytics import Analytics
-
+from app.monitoring.logging import logger
 from app.rag.evaluators.faithfulness import FaithfulnessEvaluator
 from app.rag.evaluators.hallucination import HallucinationEvaluator
 from app.rag.evaluators.relevancy import RelevancyEvaluator
 from app.rag.evaluators.retrieval_metrics import RetrievalMetrics
-
-from app.monitoring.logging import logger
 
 
 class AnalyticsService:

@@ -15,14 +15,14 @@ from app.api.routes.health import (
 from app.api.routes.search import (
     router as search_router,
 )
+from app.api.routes.summarization import (
+    router as summarization_router,
+)
 from app.api.routes.upload import (
     router as upload_router,
 )
 from app.api.routes.websocket import (
     router as websocket_router,
-)
-from app.api.routes.summarization import (
-    router as summarization_router,
 )
 
 api_router = APIRouter()

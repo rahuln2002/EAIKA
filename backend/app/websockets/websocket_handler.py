@@ -5,44 +5,34 @@ from fastapi import (
     WebSocket,
     WebSocketDisconnect,
 )
-
 from jose import jwt
-from jose.exceptions import JWTError, ExpiredSignatureError
-
+from jose.exceptions import ExpiredSignatureError, JWTError
 from sqlalchemy.orm import Session
 
 from app.core.config.settings import (
     settings,
 )
-
 from app.db.session import SessionLocal
-
-from app.services.chat.chat_service import (
-    ChatService,
+from app.monitoring.logging import (
+    logger,
 )
-
-from app.services.analytics.analytics_service import (
-    AnalyticsService,
-)
-
-from app.services.retrieval.retrieval_service import (
-    RetrievalService,
-)
-
-from app.services.llm.provider_manager import (
-    ProviderManager,
-)
-
 from app.rag.prompts.retrieval_prompt import (
     build_rag_prompt,
 )
-
+from app.services.analytics.analytics_service import (
+    AnalyticsService,
+)
+from app.services.chat.chat_service import (
+    ChatService,
+)
+from app.services.llm.provider_manager import (
+    ProviderManager,
+)
+from app.services.retrieval.retrieval_service import (
+    RetrievalService,
+)
 from app.websockets.connection_manager import (
     ConnectionManager,
-)
-
-from app.monitoring.logging import (
-    logger,
 )
 
 # =====================================================

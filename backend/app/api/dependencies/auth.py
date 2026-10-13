@@ -1,7 +1,5 @@
-from fastapi import Depends
-from fastapi import HTTPException
-from fastapi.security import HTTPAuthorizationCredentials
-from fastapi.security import HTTPBearer
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.security.jwt_handler import (
     verify_token,

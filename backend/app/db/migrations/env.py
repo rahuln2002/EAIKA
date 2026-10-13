@@ -1,9 +1,6 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from app.core.config.settings import (
     settings,
 )
@@ -12,13 +9,13 @@ from app.db.base import Base
 # =========================================================
 # IMPORT MODELS
 # =========================================================
-
 from app.db.models.analytics import Analytics  # noqa: F401
 from app.db.models.chat import Chat  # noqa: F401
 from app.db.models.chunk import Chunk  # noqa: F401
 from app.db.models.document import Document  # noqa: F401
 from app.db.models.message import Message  # noqa: F401
 from app.db.models.user import User  # noqa: F401
+from sqlalchemy import engine_from_config, pool
 
 # =========================================================
 # ALEMBIC CONFIG

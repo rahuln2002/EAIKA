@@ -1,11 +1,10 @@
-from app.core.constants.cache_constants import CHAT_PREFIX, CHAT_TTL
-from app.cache.cache_manager import CacheManager
-from sqlalchemy.orm import Session
 from sqlalchemy import desc
+from sqlalchemy.orm import Session
 
+from app.cache.cache_manager import CacheManager
+from app.core.constants.cache_constants import CHAT_PREFIX, CHAT_TTL
 from app.db.models.chat import Chat
 from app.db.models.message import Message
-
 from app.rag.pipelines.rag_pipeline import (
     RAGPipeline,
 )
@@ -230,9 +229,7 @@ class ChatService:
         Retrieve user chats.
         """
 
-        chats = (
-            db.query(Chat).filter(Chat.user_id == user_id).order_by(desc(Chat.id)).all()
-        )
+        chats = db.query(Chat).filter(Chat.user_id == user_id).order_by(desc(Chat.id)).all()
 
         return [
             {
