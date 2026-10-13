@@ -5,6 +5,9 @@ import { logout } from "../lib/auth";
 
 import { useChatStore } from "../store/chatStore";
 
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 export default function ChatPage() {
     // ===================================================
     // LOCAL STATE
@@ -283,13 +286,21 @@ export default function ChatPage() {
                         }`}
                     >
                         <div
-                            className={`inline-block p-4 rounded-xl max-w-[80%] whitespace-pre-wrap ${
+                            className={`inline-block p-4 rounded-xl max-w-[80%] text-left ${
                                 message.role === "user"
-                                    ? "bg-black text-white"
+                                    ? "bg-black text-white whitespace-pre-wrap"
                                     : "bg-gray-200 text-black"
                             }`}
                         >
-                            {message.content}
+                            {message.role === "assistant" ? (
+                                <div className="prose prose-sm max-w-none wrap-break-word">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                        {message.content}
+                                    </ReactMarkdown>
+                                </div>
+                            ) : (
+                                message.content
+                            )}
                         </div>
                     </div>
                 ))}
