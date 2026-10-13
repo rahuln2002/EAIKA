@@ -19,6 +19,7 @@ pydantic[email]
 sqlalchemy
 psycopg2-binary
 alembic
+psycopg[binary]
 
 # =========================
 # AUTHENTICATION & SECURITY
