@@ -20,9 +20,7 @@ class RelevancyEvaluator:
         Compute cosine similarity.
         """
 
-        return float(
-            dot(embedding_1, embedding_2) / (norm(embedding_1) * norm(embedding_2))
-        )
+        return float(dot(embedding_1, embedding_2) / (norm(embedding_1) * norm(embedding_2)))
 
     @classmethod
     def evaluate(
