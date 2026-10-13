@@ -17,7 +17,7 @@ class GroqService:
     def generate_response(
         cls,
         prompt: str,
-        model: str = ("llama-3.3-70b-versatile"),
+        model: str = ("openai/gpt-oss-120b"),
     ) -> str:
         """
         Generate normal response.
@@ -34,6 +34,10 @@ class GroqService:
                 }
             ],
             temperature=0.7,
+            max_completion_tokens=2048,
+            top_p=1,
+            reasoning_effort="medium",
+            stop=None,
         )
 
         logger.info("Groq response received")
@@ -44,7 +48,7 @@ class GroqService:
     def stream_response(
         cls,
         prompt: str,
-        model: str = ("llama-3.3-70b-versatile"),
+        model: str = ("openai/gpt-oss-120b"),
     ):
         """
         Stream response tokens.
@@ -60,7 +64,11 @@ class GroqService:
                 }
             ],
             temperature=0.7,
+            max_completion_tokens=2048,
+            top_p=1,
+            reasoning_effort="medium",
             stream=True,
+            stop=None,
         )
 
         for chunk in stream:
